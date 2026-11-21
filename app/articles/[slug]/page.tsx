@@ -37,6 +37,7 @@ export default async function ReadArticle({ params }: Props) {
         <div className="article-body md">
           <Markdown remarkPlugins={[remarkGfm]}>{a.body}</Markdown>
         </div>
+        {a.ticket && <Link href={'/#roadmap/'+a.ticket}>Проверить навык в Learning Roadmap</Link>}
       </article>
       {others.length > 0 && (
         <section className="article-related">

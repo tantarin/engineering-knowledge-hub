@@ -104,5 +104,6 @@
   "101": "Write Skew and Database Constraints",
   "103": "Индексы",
   "104": "Транзакции в БД — карта темы",
-  "105": "сисдиз"
+  "105": "сисдиз",
+  "106": "ForkJoinPool fork join RecursiveTask work stealing"
 }

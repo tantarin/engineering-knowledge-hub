@@ -44,7 +44,9 @@
       "Выбирает верхнюю границу для чтения",
       "Различает ошибку типов и стирание"
     ],
-    "sources": ["https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html"]
+    "sources": [
+      "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html"
+    ]
   },
   {
     "key": "record-value",
@@ -276,7 +278,9 @@
     "skills": [
       "Соединить асинхронные загрузки заказа и пользователя",
       "Сравнить типы thenApply и thenCompose",
-      "Проверить исключительное завершение второй стадии"
+      "Проверить исключительное завершение второй стадии",
+      "Объединить два независимых запроса через thenCombine",
+      "Выбрать executor для блокирующего шага и объяснить, в каком потоке может выполняться продолжение"
     ],
     "question": "Как получить Future профиля из Future заказа и асинхронного запроса профиля без блокировки?",
     "answer": "Использовать thenCompose с функцией из заказа в стадию профиля. Возвращаемая стадия завершится после внутренней. join внутри функции мог бы занять рабочий поток ожиданием.",
@@ -501,7 +505,9 @@
       "Определяет смысл пересекающего границу события",
       "Выявляет владельца данных"
     ],
-    "sources": ["https://martinfowler.com/bliki/BoundedContext.html"]
+    "sources": [
+      "https://martinfowler.com/bliki/BoundedContext.html"
+    ]
   },
   {
     "key": "ddd-aggregate",
@@ -523,7 +529,9 @@
       "Показывает численный пример гонки",
       "Предлагает политику конфликта"
     ],
-    "sources": ["https://martinfowler.com/bliki/DDD_Aggregate.html"]
+    "sources": [
+      "https://martinfowler.com/bliki/DDD_Aggregate.html"
+    ]
   },
   {
     "key": "clean-boundaries",
@@ -665,7 +673,9 @@
       "Разделяет валидацию и поиск",
       "Сохраняет бизнес-логику вне маршрута"
     ],
-    "sources": ["https://sparkjava.com/documentation"]
+    "sources": [
+      "https://sparkjava.com/documentation"
+    ]
   },
   {
     "key": "test-doubles",
@@ -687,7 +697,9 @@
       "Выбирает наблюдаемое поведение",
       "Поясняет причину проверки числа вызовов"
     ],
-    "sources": ["https://martinfowler.com/articles/mocksArentStubs.html"]
+    "sources": [
+      "https://martinfowler.com/articles/mocksArentStubs.html"
+    ]
   },
   {
     "key": "postgres-integration-test",
@@ -709,7 +721,9 @@
       "Изолирует данные тестовых случаев",
       "Называет оставшиеся различия среды"
     ],
-    "sources": ["https://java.testcontainers.org/modules/databases/postgres/"]
+    "sources": [
+      "https://java.testcontainers.org/modules/databases/postgres/"
+    ]
   },
   {
     "key": "junit-parameterized",
@@ -733,6 +747,54 @@
     ],
     "sources": [
       "https://docs.junit.org/current/writing-tests/parameterized-classes-and-tests.html"
+    ]
+  },
+  {
+    "key": "thread-pool-executor",
+    "area": "Java",
+    "section": "Многопоточность (Concurrency)",
+    "subsection": "Пулы потоков",
+    "title": "ThreadPoolExecutor: размер пула, очередь и отказ",
+    "difficulty": "Middle",
+    "theory": "После достижения corePoolSize исполнитель сначала предлагает задачу очереди. При отказе очереди пытается создать работника до maximumPoolSize, затем применяет политику отклонения.",
+    "skills": [
+      "Предсказать размещение семи долгих задач при core=2, max=4 и очереди на два места",
+      "Объяснить влияние неограниченной очереди на задержку и рост пула",
+      "Показать обработку RejectedExecutionException при перегрузке"
+    ],
+    "question": "Первые две задачи заняли пул с core=2 и max=4. Почему третья ждёт, хотя максимум ещё не достигнут?",
+    "answer": "Если очередь принимает задачу, новый работник сверх core обычно не создаётся. При заполнении очереди следующие поступления могут увеличить пул до четырёх работников.",
+    "criteria": [
+      "Различает базовое и максимальное число работников",
+      "Показывает момент заполнения очереди",
+      "Объясняет отказ при исчерпании обеих ёмкостей"
+    ],
+    "sources": [
+      "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+    ]
+  },
+  {
+    "key": "fork-join-pool",
+    "area": "Java",
+    "section": "Многопоточность (Concurrency)",
+    "subsection": "Параллельные вычисления",
+    "title": "ForkJoinPool: work stealing и RecursiveTask",
+    "difficulty": "Senior",
+    "theory": "Рекурсивная задача выделяет независимые подзадачи. Свободные работники могут забирать ожидающую работу у других, а join возвращает результат подзадачи.",
+    "skills": [
+      "Реализовать fork одной половины, вычисление второй и join результата",
+      "Сравнить последовательную версию и два порога дробления на одном массиве",
+      "Объяснить влияние блокирующего I/O на доступность работников"
+    ],
+    "question": "Почему дробление массива до одного элемента на задачу может замедлить параллельное суммирование?",
+    "answer": "В каждом листе почти нет вычислений. Затраты планирования и объединения могут превысить выигрыш. Достаточно крупный последовательный лист уменьшает эти затраты, сохраняя параллелизм между диапазонами.",
+    "criteria": [
+      "Различает параллелизм и количество созданных задач",
+      "Объясняет, что крадёт свободный работник",
+      "Предлагает измеримый способ подобрать порог"
+    ],
+    "sources": [
+      "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ForkJoinPool.html"
     ]
   }
 ]

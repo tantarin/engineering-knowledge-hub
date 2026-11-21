@@ -1,10 +1,12 @@
 import { siteName } from "../../src/identity";
+import {library} from "../../src/articles/library";
 import Link from "next/link";
 import { articles } from "../../src/articles/concurrency";
 export const metadata = {
   title: "Многопоточность Java",
 };
 export default function Contents() {
+  const forkJoin = library.find(a=>a.slug==="fork-join-pool")!;
   return (
     <main className="article-shell">
       <nav>
@@ -29,6 +31,7 @@ export default function Contents() {
                   <p>{a.lead}</p>
                 </Link>
               ))}
+            {group === "Выполнение задач" && <Link href={"/articles/"+forkJoin.slug+"/"}><h3>{forkJoin.title}</h3><p>{forkJoin.summary}</p></Link>}
           </div>
         </section>
       ))}

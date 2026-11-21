@@ -10,6 +10,7 @@ export interface PublicArticle {
   group: string;
   summary: string;
   body: string;
+  ticket?:string;
 }
 export type ArticleListing = Omit<PublicArticle, "body" | "num">;
 export const library: PublicArticle[] = [
