@@ -1,13 +1,14 @@
+import { siteName } from "../../src/identity";
 import Link from "next/link";
 import { articles } from "../../src/articles/concurrency";
 export const metadata = {
-  title: "Многопоточность Java · Engineering Knowledge Hub",
+  title: "Многопоточность Java",
 };
 export default function Contents() {
   return (
     <main className="article-shell">
       <nav>
-        <Link href="/">Engineering Knowledge Hub</Link> / Java
+        <Link href="/">{siteName}</Link> / Java
       </nav>
       <header>
         <h1>Многопоточность в Java</h1>

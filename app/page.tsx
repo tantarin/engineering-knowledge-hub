@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import {authorName,authorRole,siteName} from "../src/identity";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
@@ -287,9 +288,7 @@ export default function Page() {
             <Layers size={23} />
           </span>
           <span>
-            Engineering
-            <br />
-            <strong>Knowledge Hub</strong>
+            <strong>{siteName}</strong>
           </span>
         </div>
         <div className="nav-label">WORKSPACE</div>
@@ -316,10 +315,10 @@ export default function Page() {
         ))}
         <div className="side-bottom">
           <div className="profile">
-            <span className="avatar">Я</span>
+            <span className="avatar">ТТ</span>
             <div>
-              <strong>Моя лаборатория</strong>
-              <small>Personal workspace</small>
+              <strong>{authorName}</strong>
+              <small>{authorRole}</small>
             </div>
           </div>
         </div>
@@ -396,7 +395,7 @@ export default function Page() {
             <>
               <div className="page-head">
                 <div className="eyeline">
-                  <span className="live-dot" /> ENGINEERING WORKSPACE
+                  <span className="live-dot" /> БАЗА ЗНАНИЙ
                 </div>
                 <div className="spread">
                   <h1>{title}</h1>

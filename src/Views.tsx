@@ -20,6 +20,7 @@ import {
   Clock3,
   ListChecks,
 } from "lucide-react";
+import {siteName,authorRole} from "./identity";
 import Art from "./Art";
 import MD from "./Markdown";
 import { State, Note, Item, interviewCats, date, due } from "./types";
@@ -100,15 +101,15 @@ export function Dashboard({
     <>
       <div className="page-head">
         <div className="eyeline">
-          <span className="live-dot" /> ПЕРСОНАЛЬНАЯ ЛАБОРАТОРИЯ
+          <span className="live-dot" /> {authorRole.toLocaleUpperCase("ru")}
         </div>
         <div className="spread">
-          <h1>Dashboard</h1>
+          <h1>{siteName}</h1>
           <button className="primary" onClick={create}>
             <Plus size={17} /> Новый материал
           </button>
         </div>
-        <p>Ваши материалы, практика и план обучения.</p>
+        <p>Статьи о бэкенд-разработке, практические задачи и подготовка к интервью.</p>
       </div>
       <div className="dash-top">
         <section className="focus">

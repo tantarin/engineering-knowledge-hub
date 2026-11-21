@@ -1,3 +1,4 @@
+import { siteName } from "../../../src/identity";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Markdown from "react-markdown";
@@ -12,7 +13,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const a = library.find((x) => x.slug === slug);
   return {
-    title: a?.title + " · Engineering Knowledge Hub",
+    title: a?.title,
     description: a?.summary,
   };
 }
@@ -24,7 +25,7 @@ export default async function ReadArticle({ params }: Props) {
   return (
     <main className="article-shell">
       <nav>
-        <Link href="/">Engineering Knowledge Hub</Link> /{" "}
+        <Link href="/">{siteName}</Link> /{" "}
         <Link href="/articles/">Все статьи</Link>
       </nav>
       <article>

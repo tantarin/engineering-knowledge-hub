@@ -1,3 +1,4 @@
+import { siteName } from "../../../src/identity";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { articles } from "../../../src/articles/concurrency";
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const a = articles.find((v) => v.slug === slug);
   return {
-    title: a?.title + " · Engineering Knowledge Hub",
+    title: a?.title,
     description: a?.lead,
   };
 }
@@ -26,7 +27,7 @@ export default async function Article({ params }: Props) {
   return (
     <main className="article-shell">
       <nav>
-        <Link href="/">Engineering Knowledge Hub</Link> /{" "}
+        <Link href="/">{siteName}</Link> /{" "}
         <Link href="/concurrency/">Многопоточность</Link>
       </nav>
       <article>
