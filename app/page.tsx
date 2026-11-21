@@ -79,6 +79,7 @@ const descriptions = {
   english: "Объясняйте инженерные концепции на английском.",
   tasks: "Планируйте конкретные шаги для изучения темы.",
 };
+import {useArticleSearch} from "../src/articles/search";
 export default function Page() {
   const [s, S] = useState<State>(null),
     [route, R] = useState("dashboard"),
@@ -256,6 +257,7 @@ export default function Page() {
             .includes(q.trim().toLowerCase()),
         ) || []
       : [];
+  const publicMatches=useArticleSearch(modal==="search"?q:"");
   const library = matched.filter(
     (n) =>
       folder === "Все источники" ||
@@ -298,7 +300,7 @@ export default function Page() {
         <div className="nav-label">WORKSPACE</div>
         {nav.map(([key, text, Icon], i) => (
           <div key={key}>
-            {i === 4 && <><Link href="/concurrency/" className="nav article-nav" title="Многопоточность"><BookOpen size={18}/><span>Многопоточность</span></Link><div className="nav-label second">LEARNING TOOLS</div></>}
+            {i === 4 && <><Link href="/articles/" className="nav article-nav" title="Все статьи"><LibraryBig size={18}/><span>Все статьи</span></Link><Link href="/concurrency/" className="nav article-nav" title="Многопоточность"><BookOpen size={18}/><span>Многопоточность</span></Link><div className="nav-label second">LEARNING TOOLS</div></>}
             <button
               className={
                 "nav " +
@@ -432,7 +434,7 @@ export default function Page() {
                 <p>{descriptions[p]}</p>
               </div>
               {p === "library" && (
-                <>
+                <><Link href="/articles/" className="text-btn"><LibraryBig size={17}/> Открыть каталог статей для интервью</Link>
                   <div className="filters">
                     <label className="search-input">
                       <Search size={17} />
@@ -697,6 +699,7 @@ export default function Page() {
             />
           </label>
           <div className="results">
+            {publicMatches.slice(0,12).map(a=><Link key={a.slug} className="row" href={'/articles/'+a.slug+'/'}><BookOpen size={16}/>{a.title}<small>Статья</small></Link>)}
             {matched.slice(0, 40).map((n) => (
               <button className="row" key={n.id} onClick={() => open(n)}>
                 <FileText size={16} />
@@ -714,7 +717,8 @@ export default function Page() {
                 <small>{kindNames[i.kind]}</small>
               </button>
             ))}
-            {!matched.length && !foundItems.length && <p>Совпадений нет.</p>}
+            {!matched.length && !foundItems.length && <p>В личных записях совпадений нет.</p>}
+            <Link className="row" href={q.trim()?{pathname:"/articles/",query:{q:q.trim()}}:"/articles/"}><BookOpen size={16}/>{q.trim()?"Искать в опубликованных статьях":"Все опубликованные статьи"}</Link>
           </div>
         </Modal>
       )}

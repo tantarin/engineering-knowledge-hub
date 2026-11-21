@@ -10,3 +10,4 @@ public/syllabus.json
 *.zip
 *personal.json
 .DS_Store
+public/article-search.json
