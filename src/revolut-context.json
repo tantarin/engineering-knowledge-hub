@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Software Engineer (Java) · требования роли Mid/Senior",
+    "url": "https://www.revolut.com/careers/position/software-engineer-backend-530d3bfd-bdca-4390-8f8a-bc88ddc1eb51/",
+    "claim": "В вакансии указаны свободное владение Java и английским, от четырёх лет backend-разработки, навыки коммуникации и командной работы. Kotlin или Scala перечислены как преимущество.",
+    "checked": "2026-11-21"
+  },
+  {
+    "title": "Software Engineer (Java) · стек команды",
+    "url": "https://www.revolut.com/careers/position/software-engineer-backend-530d3bfd-bdca-4390-8f8a-bc88ddc1eb51/",
+    "claim": "В описании команды перечислены Java 17/21, PostgreSQL, Redis, jOOQ, Flyway, Kubernetes и GCP. Команда также упоминает TDD, DDD и CI/CD.",
+    "checked": "2026-11-21"
+  },
+  {
+    "title": "How to ace your Java interview at Revolut · 31 марта 2025",
+    "url": "https://www.revolut.com/en-LV/blog/post/how-to-ace-your-java-interview-at-revolut/",
+    "claim": "В статье описаны live coding на Java, техническая беседа и system design. Среди тем подготовки названы конкурентность, базы данных и архитектура. В описании используемых инструментов упомянут SparkJava.",
+    "checked": "2026-11-21"
+  }
+]

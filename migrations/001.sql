@@ -1,0 +1,11 @@
+CREATE TABLE notes(id TEXT PRIMARY KEY, origin TEXT NOT NULL, title TEXT NOT NULL, category TEXT NOT NULL, tags TEXT NOT NULL, body TEXT NOT NULL, sources TEXT NOT NULL, status TEXT NOT NULL, level INTEGER NOT NULL, practice TEXT NOT NULL, explanation TEXT NOT NULL, prompt TEXT NOT NULL, english TEXT NOT NULL, created TEXT NOT NULL, updated TEXT NOT NULL);
+CREATE VIRTUAL TABLE search USING fts5(id UNINDEXED,title,category,tags,body,practice,explanation,prompt,english);
+CREATE TRIGGER notes_insert AFTER INSERT ON notes BEGIN INSERT INTO search VALUES(new.id,new.title,new.category,new.tags,new.body,new.practice,new.explanation,new.prompt,new.english); END;
+CREATE TRIGGER notes_delete AFTER DELETE ON notes BEGIN DELETE FROM search WHERE id=old.id; END;
+CREATE TRIGGER notes_update AFTER UPDATE ON notes BEGIN DELETE FROM search WHERE id=old.id; INSERT INTO search VALUES(new.id,new.title,new.category,new.tags,new.body,new.practice,new.explanation,new.prompt,new.english); END;
+CREATE TABLE revisions(id TEXT PRIMARY KEY,note TEXT NOT NULL REFERENCES notes ON DELETE CASCADE,snapshot TEXT NOT NULL,created TEXT NOT NULL);
+CREATE TABLE links(id TEXT PRIMARY KEY,source TEXT NOT NULL REFERENCES notes ON DELETE CASCADE,target TEXT NOT NULL REFERENCES notes ON DELETE CASCADE,label TEXT NOT NULL, UNIQUE(source,target),CHECK(source<>target));
+CREATE TABLE items(id TEXT PRIMARY KEY,kind TEXT NOT NULL,note TEXT REFERENCES notes ON DELETE SET NULL,title TEXT NOT NULL,details TEXT NOT NULL,updated TEXT NOT NULL);
+CREATE TABLE reviews(id TEXT PRIMARY KEY,card TEXT NOT NULL REFERENCES items ON DELETE CASCADE,rating INTEGER NOT NULL,created TEXT NOT NULL);
+CREATE TABLE assets(id TEXT PRIMARY KEY,mime TEXT NOT NULL,bytes BLOB NOT NULL);
+PRAGMA user_version=1;

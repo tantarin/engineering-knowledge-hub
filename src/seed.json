@@ -1,0 +1,46 @@
+[
+  {
+    "title": "MVCC и снимок транзакции",
+    "category": "PostgreSQL",
+    "tags": ["MVCC", "Transactions", "SQL"],
+    "body": "## Какую версию строки увидит отчёт?\n\nPostgreSQL хранит версии строк. Для обычного SELECT снимок определяет, какие изменения других транзакций уже видны запросу. В Read Committed два чтения в одной транзакции могут вернуть разные значения. В Repeatable Read снимок фиксируется первой командой, работающей с данными.\n\n### Опыт с двумя соединениями\n\nВ учебной базе создайте таблицу и добавьте один товар. Выполните эти команды до начала эксперимента в режиме автокоммита.\n\n```sql\nCREATE TABLE lab_stock (id integer PRIMARY KEY, qty integer);\nINSERT INTO lab_stock VALUES (1, 10);\n```\n\nВ первом соединении начните чтение.\n\n```sql\nBEGIN ISOLATION LEVEL REPEATABLE READ;\nSELECT qty FROM lab_stock WHERE id = 1;\n```\n\nВо втором соединении выполните `UPDATE lab_stock SET qty = 7 WHERE id = 1` и зафиксируйте изменение. Повторите SELECT в первом соединении. Он по-прежнему вернёт 10. После COMMIT следующий запрос увидит 7.",
+    "sources": ["https://www.postgresql.org/docs/current/transaction-iso.html"],
+    "prompt": "Если второе соединение зафиксирует изменение между BEGIN и первым SELECT, какое количество увидит первое соединение в Repeatable Read? Объясните момент выбора снимка.",
+    "english": "In PostgreSQL, a repeatable-read transaction takes its snapshot at the start of its first statement that accesses data. If the update commits before that statement begins, the reader sees seven items."
+  },
+  {
+    "title": "Consumer groups и сохранение offset",
+    "category": "Kafka",
+    "tags": ["Consumer Groups", "Offset Management", "At-Least-Once"],
+    "body": "## Кто продолжит чтение после сбоя?\n\nВ Kafka группа потребителей делит между участниками партиции топика. Offset указывает позицию внутри одной партиции. Получение записи сдвигает позицию потребителя. Отдельно группа сохраняет позицию, с которой следует возобновить чтение после перезапуска.\n\n### Пример обработки заказа\n\nДля партиции orders-0 группа сохранила offset 42. При выключенном автокоммите обработчик получает запись 42 и успешно добавляет заказ в базу. Затем процесс завершается, не успев сохранить следующую позицию 43. При возобновлении группа снова прочитает запись 42.\n\nЧтобы повторное чтение не создало второй заказ, можно сохранить идентификатор события под уникальным ограничением в одной транзакции с созданием заказа. Тогда повтор обнаружится до повторного изменения состояния.",
+    "sources": [
+      "https://kafka.apache.org/41/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html"
+    ],
+    "prompt": "Что произойдёт с заказом, если сохранить offset 43 до записи заказа в БД, а затем потерять процесс между этими двумя действиями?",
+    "english": "A committed offset identifies where the group resumes reading. If the consumer commits the next offset before its database write succeeds, a crash can leave the order missing even though the group has advanced past its event."
+  },
+  {
+    "title": "Виртуальные потоки в Java 21",
+    "category": "Java 21",
+    "tags": ["JVM", "Concurrency", "Virtual Threads"],
+    "body": "## Поток на каждый запрос\n\nКогда сервис одновременно ждёт ответы от множества удалённых систем, задачам приходится долго простаивать. JVM может приостановить виртуальный поток во время поддерживаемой блокирующей операции и отдать его поток ОС другой задаче. Так можно сохранить последовательный стиль кода и обслуживать больше одновременных ожиданий.\n\n### Опыт в JShell на JDK 21\n\nВместо сетевого вызова смоделируйте ожидание таймером.\n\n```java\ntry (var pool = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {\n    for (int i = 0; i < 50; i++) {\n        pool.submit(() -> {\n            Thread.sleep(200);\n            return Thread.currentThread().isVirtual();\n        });\n    }\n}\n```\n\nЗакрытие executor дождётся завершения задач. Чтобы исследовать пропускную способность, сравните время всей группы с фиксированным пулом из двух платформенных потоков. При реальном запросе к БД отдельно учитывайте размер пула соединений.",
+    "sources": [
+      "https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html"
+    ],
+    "prompt": "Почему сервис с большим количеством ожидающих запросов может выиграть от виртуальных потоков, а задача вычисления хеша одного большого файла — получить тот же результат по времени?",
+    "english": "Virtual threads let many waiting tasks share a smaller set of operating-system threads. This can improve throughput for concurrent I/O. A single CPU-bound computation still needs the same processor work."
+  },
+  {
+    "title": "Срок жизни ключа в Redis",
+    "category": "Redis",
+    "tags": ["TTL", "Expiration", "Caching"],
+    "body": "## Почему счётчик остался в памяти?\n\nПредположим, счётчик обращений должен исчезнуть через минуту после создания. Redis хранит срок жизни вместе с ключом. При обновлении счётчика важно учитывать, заменяет ли команда значение целиком.\n\n### Проверьте в redis-cli\n\nВыполните команды в учебной базе в течение минуты.\n\n```redis\nSET lab:hits 1 EX 60\nINCR lab:hits\nTTL lab:hits\nSET lab:hits 3\nTTL lab:hits\n```\n\nПервый TTL покажет оставшееся время в секундах. INCR сохраняет прежний срок. Обычный SET перезаписывает значение и снимает ограничение по времени, поэтому второй TTL вернёт -1. Если замена должна сохранить прежний дедлайн, у SET есть опция KEEPTTL.",
+    "sources": [
+      "https://redis.io/docs/latest/commands/expire/",
+      "https://redis.io/docs/latest/commands/set/",
+      "https://redis.io/docs/latest/commands/ttl/"
+    ],
+    "prompt": "Пользователь обновляет значение каждые десять секунд. Чем будет отличаться момент удаления при SET с EX 60 и при SET с KEEPTTL, если исходный TTL равен минуте?",
+    "english": "Using SET with EX 60 starts a fresh sixty-second lifetime on each write. KEEPTTL preserves the existing expiration time, so updates before that deadline do not extend the original window."
+  }
+]

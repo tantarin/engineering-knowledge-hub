@@ -1,0 +1,12 @@
+node_modules/
+.next/
+data/
+.env*
+!.env.example
+*.tsbuildinfo
+out/
+public/syllabus.json
+*.sqlite*
+*.zip
+*personal.json
+.DS_Store
