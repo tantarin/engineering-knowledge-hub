@@ -17,7 +17,9 @@ export default async function StagePage({ params }: Props) {
   const id = (await params).stage,
     stage = stages.find((s) => s.id === id);
   if (!stage) notFound();
-  const other = stages.find((s) => s.id !== id)!;
+  const position = stages.indexOf(stage);
+  const previous = stages[position - 1],
+    next = stages[position + 1];
   return (
     <main className="article-shell">
       <nav>
@@ -27,16 +29,24 @@ export default async function StagePage({ params }: Props) {
       <header>
         <small>{stage.label} · Revolut</small>
         <h1>{stage.title}</h1>
+        {stage.duration && <strong>{stage.duration}</strong>}
         <p>{stage.goal}</p>
       </header>
       <section>
         <h2>Как проходит этап</h2>
-        <p>
-          {stage.format}{" "}
+        <p>{stage.format}</p>
+        <small>
+          Формат и длительность приведены по личному опыту интервью.{" "}
           <a href="https://www.revolut.com/blog/post/how-to-ace-your-java-interview-at-revolut/">
-            Руководство Revolut, 31 марта 2025
+            Официальный гид Revolut для Java Engineer
           </a>
-        </p>
+        </small>
+        {stage.blocks?.map((block) => (
+          <div key={block.title}>
+            <h3>{block.title}</h3>
+            <p>{block.text}</p>
+          </div>
+        ))}
       </section>
       <section>
         <h2>Порядок подготовки</h2>
@@ -71,9 +81,14 @@ export default async function StagePage({ params }: Props) {
       </section>
       <footer>
         <Link href="/articles/">Учебный маршрут</Link>
-        <Link href={"/revolut/" + other.id + "/"}>
-          {other.label} · {other.title}
-        </Link>
+        {previous && (
+          <Link href={"/revolut/" + previous.id + "/"}>
+            Назад · {previous.title}
+          </Link>
+        )}
+        {next && (
+          <Link href={"/revolut/" + next.id + "/"}>Далее · {next.title}</Link>
+        )}
       </footer>
     </main>
   );

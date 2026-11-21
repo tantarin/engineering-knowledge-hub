@@ -7,6 +7,10 @@ export function StageLinks() {
       aria-label="Подготовка к собеседованию в Revolut"
     >
       <h2>Собеседование в Revolut</h2>
+      <p>
+        Маршрут по личному опыту интервью. Основная тренировка — live coding и
+        техническая теория.
+      </p>
       <div>
         {stages.map((stage) => (
           <Link
@@ -16,6 +20,7 @@ export function StageLinks() {
           >
             <small>{stage.label}</small>
             <strong>{stage.title}</strong>
+            {stage.duration && <small>{stage.duration}</small>}
           </Link>
         ))}
       </div>
