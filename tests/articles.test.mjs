@@ -49,3 +49,13 @@ test("reading tracks cover every article exactly once and preserve prerequisites
   ])
     assert.ok(route.indexOf(before) < route.indexOf(after));
 });
+
+test("Both Revolut stages have separate preparation routes and a rehearsal", () => {
+  const stages = JSON.parse(readFileSync(new URL("../src/articles/interview-stages.json", import.meta.url)));
+  const pages = new Set(["guide", "java", "data", "design"].flatMap(read).map(a => a.slug));
+  assert.deepEqual(stages.map(stage => stage.id), ["recruiter", "java-live-coding"]);
+  for (const stage of stages) {
+    assert.ok(stage.exercise && stage.checks.length && stage.lessons.length);
+    for (const lesson of stage.lessons) assert.ok(pages.has(lesson.slug) && lesson.task);
+  }
+});

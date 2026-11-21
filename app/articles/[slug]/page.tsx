@@ -1,4 +1,6 @@
 import { siteName } from "../../../src/identity";
+import { Suspense } from "react";
+import StagePager from "../../../src/articles/StagePager";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Markdown from "react-markdown";
@@ -27,6 +29,26 @@ export default async function ReadArticle({ params }: Props) {
   if (!a) notFound();
   const others = related(a);
   const { chapter, lesson, previous, next } = readingPosition(slug);
+  const usualPager = (
+    <nav aria-label="Порядок чтения" className="lesson-pager">
+      {previous && (
+        <Link href={"/articles/" + previous.slug + "/"}>
+          <small>Предыдущая статья</small>
+          {previous.title}
+        </Link>
+      )}
+      {next ? (
+        <Link href={"/articles/" + next.slug + "/"}>
+          <small>Следующая статья</small>
+          {next.title}
+        </Link>
+      ) : (
+        <Link href="/articles/">
+          <small>Последняя статья маршрута</small>Вернуться к разделам
+        </Link>
+      )}
+    </nav>
+  );
   return (
     <main className="article-shell">
       <nav>
@@ -53,24 +75,9 @@ export default async function ReadArticle({ params }: Props) {
           </Link>
         )}
       </article>
-      <nav aria-label="Порядок чтения" className="lesson-pager">
-        {previous && (
-          <Link href={"/articles/" + previous.slug + "/"}>
-            <small>Предыдущая статья</small>
-            {previous.title}
-          </Link>
-        )}
-        {next ? (
-          <Link href={"/articles/" + next.slug + "/"}>
-            <small>Следующая статья</small>
-            {next.title}
-          </Link>
-        ) : (
-          <Link href="/articles/">
-            <small>Последняя статья маршрута</small>Вернуться к разделам
-          </Link>
-        )}
-      </nav>
+      <Suspense fallback={usualPager}>
+        <StagePager slug={slug}>{usualPager}</StagePager>
+      </Suspense>
       {others.length > 0 && (
         <section className="article-related">
           <h2>Связанные материалы</h2>

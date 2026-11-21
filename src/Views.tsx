@@ -21,6 +21,7 @@ import {
   ListChecks,
 } from "lucide-react";
 import {siteName,authorRole} from "./identity";
+import {StageLinks} from "./articles/StageLinks";
 import Link from "next/link";
 import Art from "./Art";
 import MD from "./Markdown";
@@ -111,8 +112,9 @@ export function Dashboard({
           </button>
         </div>
         <p>Статьи о бэкенд-разработке, практические задачи и подготовка к интервью.</p>
-        <div className="route-entry actions"><Link className="btn primary" href="/articles/">Открыть учебный маршрут</Link><Link href="/articles/recruiter-screen-preparation/">Первый звонок в Revolut</Link></div>
+        <div className="route-entry actions"><Link className="btn primary" href="/articles/">Открыть учебный маршрут</Link></div>
       </div>
+      <StageLinks/>
       <div className="dash-top">
         <section className="focus">
           <Art />
