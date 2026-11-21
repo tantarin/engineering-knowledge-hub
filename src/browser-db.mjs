@@ -88,6 +88,12 @@ export async function roadmap(db) {
     topicNotes,
   };
 }
+function concurrencyTerms(note) {
+  const title = [note.title, ...note.tags].join(" ");
+  return /multithread|concurren|thread|happens.before|atomic operations|synchronization primitives|race conditions|livelock|starvation|deadlock|reentrantlock|многопоточ|виртуальные потоки/i.test(title)
+    ? "многопоточность многопоточка concurrency multithreading"
+    : "";
+}
 export async function search(db, q) {
   const index = new MiniSearch({
     fields: [
@@ -102,10 +108,10 @@ export async function search(db, q) {
     ],
   });
   index.addAll(
-    (await db.notes.toArray()).map((n) => ({ ...n, tags: n.tags.join(" ") })),
+    (await db.notes.toArray()).map((n) => ({ ...n, tags: [...n.tags, concurrencyTerms(n)].join(" ") })),
   );
   return index
-    .search(q, { prefix: true, combineWith: "AND", boost: { title: 3 } })
+    .search(q.replace(/многопточ[а-яё]*/gi, "многопоточность"), { prefix: true, combineWith: "AND", boost: { title: 3 } })
     .map((r) => r.id);
 }
 const latest = (p, old) => {

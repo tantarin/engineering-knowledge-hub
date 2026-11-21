@@ -171,7 +171,7 @@
   {
     "key": "jmm-publication",
     "area": "Java",
-    "section": "Concurrency",
+    "section": "Многопоточность (Concurrency)",
     "subsection": "Java Memory Model",
     "title": "Публикация данных и happens-before",
     "difficulty": "Senior",
@@ -195,7 +195,7 @@
   {
     "key": "volatile-increment",
     "area": "Java",
-    "section": "Concurrency",
+    "section": "Многопоточность (Concurrency)",
     "subsection": "Java Memory Model",
     "title": "Потерянное обновление счётчика",
     "difficulty": "Middle",
@@ -220,7 +220,7 @@
   {
     "key": "reentrant-lock",
     "area": "Java",
-    "section": "Concurrency",
+    "section": "Многопоточность (Concurrency)",
     "subsection": "Блокировки",
     "title": "ReentrantLock и прерываемое ожидание",
     "difficulty": "Senior",
@@ -244,7 +244,7 @@
   {
     "key": "condition-queue",
     "area": "Java",
-    "section": "Concurrency",
+    "section": "Многопоточность (Concurrency)",
     "subsection": "Блокировки",
     "title": "Condition и ожидание предиката",
     "difficulty": "Senior",
@@ -268,7 +268,7 @@
   {
     "key": "future-composition",
     "area": "Java",
-    "section": "Concurrency",
+    "section": "Многопоточность (Concurrency)",
     "subsection": "Асинхронные операции",
     "title": "Композиция CompletableFuture",
     "difficulty": "Middle",

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import {
   Layers,
   LayoutDashboard,
@@ -297,7 +298,7 @@ export default function Page() {
         <div className="nav-label">WORKSPACE</div>
         {nav.map(([key, text, Icon], i) => (
           <div key={key}>
-            {i === 4 && <div className="nav-label second">LEARNING TOOLS</div>}
+            {i === 4 && <><Link href="/concurrency/" className="nav article-nav" title="Многопоточность"><BookOpen size={18}/><span>Многопоточность</span></Link><div className="nav-label second">LEARNING TOOLS</div></>}
             <button
               className={
                 "nav " +
