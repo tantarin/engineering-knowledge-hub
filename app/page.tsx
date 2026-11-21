@@ -18,10 +18,7 @@ import {
   Plus,
   ChevronRight,
   Terminal,
-  Database,
   FolderOpen,
-  HardDriveDownload,
-  Upload,
   Settings2,
   Check,
   FileText,
@@ -47,7 +44,6 @@ import { Dashboard, Material, Review, Interview } from "../src/Views";
 import { Modal, NoteForm, ItemForm, kindNames } from "../src/Forms";
 import Workspace from "../src/Workspace";
 import Roadmap from "../src/Roadmap";
-import DataPanel from "../src/DataPanel";
 const Graph = dynamic(() => import("../src/Graph"), { ssr: false });
 const nav = [
   ["dashboard", "Dashboard", LayoutDashboard],
@@ -99,8 +95,7 @@ export default function Page() {
     [mobile, A] = useState(false),
     [msg, E] = useState(""),
     [tick, K] = useState(0);
-  const upload = useRef<HTMLInputElement>(null),
-    timer = useRef<any>(null);
+  const timer = useRef<any>(null);
   function tell(m: string) {
     E(m);
     clearTimeout(timer.current);
@@ -320,14 +315,6 @@ export default function Page() {
           </div>
         ))}
         <div className="side-bottom">
-          <button
-            className="nav"
-            title="Данные и копии"
-            onClick={() => M("data")}
-          >
-            <Database size={18} />
-            <span>Данные и копии</span>
-          </button>
           <div className="profile">
             <span className="avatar">Я</span>
             <div>
@@ -720,15 +707,6 @@ export default function Page() {
             {!matched.length && !foundItems.length && <p>В личных записях совпадений нет.</p>}
             <Link className="row" href={q.trim()?{pathname:"/articles/",query:{q:q.trim()}}:"/articles/"}><BookOpen size={16}/>{q.trim()?"Искать в опубликованных статьях":"Все опубликованные статьи"}</Link>
           </div>
-        </Modal>
-      )}
-      {s && modal === "data" && (
-        <Modal title="Данные и резервные копии" close={() => M("")}>
-          <p>
-            {s.notes.length} материалов · {s.links.length} связей ·{" "}
-            {s.items.length} учебных записей
-          </p>
-          <DataPanel refresh={refresh} />
         </Modal>
       )}
       {msg && (
