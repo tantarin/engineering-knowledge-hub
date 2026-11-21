@@ -47,10 +47,10 @@ import Workspace from "../src/Workspace";
 import Roadmap from "../src/Roadmap";
 const Graph = dynamic(() => import("../src/Graph"), { ssr: false });
 const nav = [
-  ["dashboard", "Dashboard", LayoutDashboard],
-  ["roadmap", "Learning Roadmap", ListChecks],
-  ["library", "Knowledge Base", LibraryBig],
-  ["graph", "Knowledge Graph", Waypoints],
+  ["dashboard", "Главная", LayoutDashboard],
+  ["roadmap", "Чек-лист навыков", ListChecks],
+  ["library", "Мои заметки", LibraryBig],
+  ["graph", "Граф знаний", Waypoints],
   ["interview", "Interview Prep", MessagesSquare],
   ["review", "Spaced Repetition", Layers],
   ["lab", "Playground", FlaskConical],
@@ -291,10 +291,11 @@ export default function Page() {
             <strong>{siteName}</strong>
           </span>
         </div>
-        <div className="nav-label">WORKSPACE</div>
+        <div className="nav-label">МОЯ БАЗА ЗНАНИЙ</div>
         {nav.map(([key, text, Icon], i) => (
           <div key={key}>
-            {i === 4 && <><Link href="/articles/" className="nav article-nav" title="Все статьи"><LibraryBig size={18}/><span>Все статьи</span></Link><Link href="/concurrency/" className="nav article-nav" title="Многопоточность"><BookOpen size={18}/><span>Многопоточность</span></Link><div className="nav-label second">LEARNING TOOLS</div></>}
+            {i === 1 && <Link href="/articles/" className="nav article-nav" title="Учебный маршрут"><BookOpen size={18}/><span>Учебный маршрут</span></Link>}
+            {i === 4 && <div className="nav-label second">ПРАКТИКА</div>}
             <button
               className={
                 "nav " +

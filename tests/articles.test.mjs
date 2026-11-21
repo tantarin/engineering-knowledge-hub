@@ -28,3 +28,24 @@ test("Every career material has an independently addressable article", () => {
     for (const num of to) assert.ok(ids.has(num));
   }
 });
+
+test("reading tracks cover every article exactly once and preserve prerequisites", () => {
+  const chapters = JSON.parse(
+    readFileSync(
+      new URL("../src/articles/reading-order.json", import.meta.url),
+    ),
+  );
+  const all = ["guide", "java", "data", "design"]
+    .flatMap(read)
+    .map((a) => a.slug);
+  const route = chapters.flatMap((c) => c.lessons);
+  assert.deepEqual([...route].sort(), all.sort());
+  assert.equal(new Set(chapters.map((c) => c.id)).size, chapters.length);
+  for (const [before, after] of [
+    ["threads-and-processes", "thread-pools"],
+    ["parallel-data-processing", "fork-join-pool"],
+    ["mvcc-visible-version", "postgres-rr-conflicts"],
+    ["dual-write-failure-matrix", "transactional-outbox-lifecycle"],
+  ])
+    assert.ok(route.indexOf(before) < route.indexOf(after));
+});

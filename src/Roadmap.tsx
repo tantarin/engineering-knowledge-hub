@@ -521,7 +521,7 @@ export default function Roadmap({
     <>
       <header className="page-head">
         <div className="spread">
-          <h1>Learning Roadmap</h1>
+          <h1>Чек-лист навыков</h1>
           <button className="primary" onClick={() => V({})}>
             <Plus size={16} /> Новая тема
           </button>

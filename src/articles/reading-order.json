@@ -1,0 +1,189 @@
+[
+  {
+    "id": "java-basics",
+    "title": "Процессы, потоки и общая память",
+    "goal": "Проследите выполнение двух запросов и найдите место, где они меняют общие данные.",
+    "track": "technical",
+    "lessons": [
+      "threads-and-processes",
+      "thread-lifecycle",
+      "concurrency-and-parallelism",
+      "cpu-and-io-bound",
+      "multithreading-field-guide",
+      "concurrent-api-requests",
+      "race-conditions",
+      "immutable-shared-state",
+      "happens-before"
+    ]
+  },
+  {
+    "id": "synchronization",
+    "title": "Атомарность и блокировки",
+    "goal": "Защитите инвариант, затем разберите взаимную блокировку и способы её избежать.",
+    "track": "technical",
+    "lessons": [
+      "critical-sections",
+      "java-sync-primitives",
+      "atomic-operations",
+      "read-write-locks",
+      "producer-consumer",
+      "wait-notify-collections",
+      "semaphores-and-conditions",
+      "thread-deadlocks",
+      "livelock",
+      "starvation-fairness",
+      "priority-inversion",
+      "classify-concurrency-failures",
+      "thread-safe-transfer"
+    ]
+  },
+  {
+    "id": "executors",
+    "title": "Исполнение задач в Java",
+    "goal": "Выберите пул, разберите дробление CPU-задачи и соберите цепочку асинхронных вызовов.",
+    "track": "technical",
+    "lessons": [
+      "thread-pools",
+      "parallel-data-processing",
+      "fork-join-pool",
+      "parallel-image-processing",
+      "when-parallelism-does-not-help",
+      "futures-and-async",
+      "java21-virtual-threads",
+      "executors-futures-virtual-threads",
+      "task-cancellation",
+      "bounded-external-concurrency",
+      "concurrent-round-robin",
+      "tdd-concurrent-code",
+      "jcip-interview-workshop"
+    ]
+  },
+  {
+    "id": "transactions",
+    "title": "Транзакции, MVCC и изоляция",
+    "goal": "На двух соединениях проверьте, какие версии строк увидит каждая транзакция.",
+    "track": "technical",
+    "lessons": [
+      "transactions-learning-map",
+      "acid-transfer",
+      "threads-connections-transactions",
+      "connection-and-thread-pools",
+      "mvcc-visible-version",
+      "sql-isolation-levels-overview",
+      "dirty-read-schedule",
+      "read-uncommitted-postgres",
+      "read-committed-stock",
+      "non-repeatable-price",
+      "repeatable-read-price",
+      "phantoms-predicate",
+      "rc-rr-stock-lab",
+      "lost-update-stock",
+      "row-lock-or-version",
+      "sql-lock-cycle",
+      "postgres-rr-conflicts",
+      "write-skew-invariant",
+      "serialization-proof",
+      "serializable-on-call",
+      "sql-transfer-interview"
+    ]
+  },
+  {
+    "id": "queries-storage",
+    "title": "SQL, индексы и масштабирование чтения",
+    "goal": "Найдите причину медленного запроса, затем проследите свежесть ответа на реплике и в кэше.",
+    "track": "technical",
+    "lessons": [
+      "btree-or-brin",
+      "postgres-index-and-plan",
+      "n-plus-one-keyset",
+      "diagnose-slow-relational-feed",
+      "partitioning-and-sharding",
+      "replica-read-your-writes",
+      "redis-cache-aside"
+    ]
+  },
+  {
+    "id": "boundaries",
+    "title": "Границы сервисов и предметная модель",
+    "goal": "Проведите запрос от API до хранилища и определите, кто отвечает за бизнес-правило.",
+    "track": "technical",
+    "lessons": [
+      "backend-fundamentals-through-one-request",
+      "architecture-boundaries",
+      "ddd-domain-vocabulary",
+      "sparkjava-jooq-boundaries",
+      "modular-monolith-extraction",
+      "events-and-commands",
+      "cqrs-read-write-models"
+    ]
+  },
+  {
+    "id": "events",
+    "title": "Доставка событий и распределённые процессы",
+    "goal": "Пройдите путь события от коммита до потребителя и проверьте восстановление после сбоя.",
+    "track": "technical",
+    "lessons": [
+      "dual-write-failure-matrix",
+      "transactional-outbox-lifecycle",
+      "relay-polling-and-cdc",
+      "outbox-event-ordering",
+      "at-least-once-consumer",
+      "consumer-inbox-transaction",
+      "projection-catch-up",
+      "projection-read-your-writes",
+      "concurrency-from-row-to-event",
+      "durable-background-jobs",
+      "cap-under-partition",
+      "timeouts-retries-isolation",
+      "choreography-orchestration",
+      "saga-compensation"
+    ]
+  },
+  {
+    "id": "design-practice",
+    "title": "Практика backend и System Design",
+    "goal": "Примените пройденное к регистрации, остатку товара, корзине и бронированию.",
+    "track": "technical",
+    "lessons": [
+      "backend-stack-one-feature",
+      "registration-capacity-race",
+      "inventory-reservations",
+      "shopping-cart-consistency",
+      "structured-system-design-interview",
+      "hotel-search-booking",
+      "system-design-practice-library",
+      "interview-task-patterns"
+    ]
+  },
+  {
+    "id": "interview",
+    "title": "Собеседование в Revolut",
+    "goal": "Разберите этапы, подготовьте рассказ о проекте и отрепетируйте ответы на английском.",
+    "track": "career",
+    "lessons": [
+      "revolut-interview-stages",
+      "recruiter-screen-preparation",
+      "engineering-impact-star",
+      "team-contribution-star",
+      "english-technical-screen",
+      "java-interview-rehearsal",
+      "weigh-candidate-reports",
+      "reported-questions-practice-matrix",
+      "evidence-of-backend-skills"
+    ]
+  },
+  {
+    "id": "job-search",
+    "title": "Поиск роли и выбор предложения",
+    "goal": "Сформулируйте критерии, подготовьте резюме и сравните условия.",
+    "track": "career",
+    "lessons": [
+      "career-goal",
+      "target-companies",
+      "location-and-relocation",
+      "backend-engineer-resume",
+      "application-funnel",
+      "interview-comparison-table"
+    ]
+  }
+]
