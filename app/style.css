@@ -1095,3 +1095,5 @@ footer .primary {
   .reading-close { display:flex; align-self:flex-end; margin-top:10px; }
   .reading-layout .topic-menu { margin-top:4px; }
 }
+.book-menu-link { margin-top:6px; text-decoration:none; color:var(--ink); font-weight:550; }
+.book-menu-link[aria-current=page] { color:var(--accent); background:var(--surface); }

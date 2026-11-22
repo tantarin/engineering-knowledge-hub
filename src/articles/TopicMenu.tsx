@@ -3,7 +3,7 @@
 import { createContext, useContext, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, Layers, PanelLeft, X } from "lucide-react";
+import { BookOpen, ChevronRight, Layers, PanelLeft, X } from "lucide-react";
 import { siteName } from "../identity";
 import type { MenuTopic } from "./topic-menu";
 
@@ -31,6 +31,9 @@ export function TopicMenu({ onNavigate }: { onNavigate?: () => void }) {
         </div>)}</div>}
       </div>;
     })}
+    <Link href="/books/" className="topic-toggle book-menu-link" aria-current={path === "/books/" ? "page" : undefined} onClick={onNavigate}>
+      <BookOpen size={14} aria-hidden="true"/><span>Книги</span>
+    </Link>
   </nav>;
 }
 
