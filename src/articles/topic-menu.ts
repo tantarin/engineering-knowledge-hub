@@ -1,6 +1,5 @@
 import { chapters } from "./library";
 import { articles } from "./concurrency";
-import stages from "./interview-stages.json";
 
 type Lesson = { title: string; href: string };
 type Section = { title: string; lessons: Lesson[] };
@@ -26,8 +25,5 @@ export const menuTopics: MenuTopic[] = [
   { title: "Spring", sections: [chapter("spring")] },
   { title: "Kubernetes и Helm", sections: [chapter("kubernetes")] },
   { title: "System Design", sections: [chapter("design-practice")] },
-  { title: "Интервью и карьера", sections: [
-    { title: "Этапы интервью", lessons: stages.map(s => ({ title: s.title, href: `/revolut/${s.id}/` })) },
-    chapter("interview"), chapter("job-search"),
-  ] },
+  { title: "Карьера", sections: [chapter("job-search")] },
 ];

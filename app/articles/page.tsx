@@ -1,7 +1,6 @@
 import { siteName } from "../../src/identity";
 import Link from "next/link";
 import { chapters } from "../../src/articles/library";
-import { StageLinks } from "../../src/articles/StageLinks";
 import Catalog from "../../src/articles/Catalog";
 export const metadata = { title: "Учебный маршрут по бэкенд-разработке" };
 export default function Collection() {
@@ -21,8 +20,7 @@ export default function Collection() {
           Начать с темы «{first.title}»
         </Link>
       </header>
-      <StageLinks />
-      <Catalog chapters={chapters} />
+      <Catalog chapters={chapters.filter(chapter => chapter.id !== "interview")} />
     </main>
   );
 }
