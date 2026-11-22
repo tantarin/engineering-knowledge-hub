@@ -17,6 +17,16 @@ export default async function StagePage({ params }: Props) {
   const id = (await params).stage,
     stage = stages.find((s) => s.id === id);
   if (!stage) notFound();
+  const sections: {
+    title: string;
+    lessons: { slug: string; task: string }[];
+  }[] = [];
+  for (const lesson of stage.lessons) {
+    const title = "section" in lesson ? String(lesson.section) : "";
+    if (!sections.length || sections[sections.length - 1].title !== title)
+      sections.push({ title, lessons: [] });
+    sections[sections.length - 1].lessons.push(lesson);
+  }
   const position = stages.indexOf(stage);
   const previous = stages[position - 1],
     next = stages[position + 1];
@@ -50,24 +60,29 @@ export default async function StagePage({ params }: Props) {
       </section>
       <section>
         <h2>Порядок подготовки</h2>
-        <ol className="stage-lessons">
-          {stage.lessons.map((l) => {
-            const article = library.find((a) => a.slug === l.slug)!;
-            return (
-              <li key={l.slug}>
-                <Link
-                  href={{
-                    pathname: "/articles/" + l.slug + "/",
-                    query: { stage: id },
-                  }}
-                >
-                  {article.title}
-                </Link>
-                <p>{l.task}</p>
-              </li>
-            );
-          })}
-        </ol>
+        {sections.map((section) => (
+          <div key={section.title}>
+            {section.title && <h3>{section.title}</h3>}
+            <ol className="stage-lessons">
+              {section.lessons.map((l) => {
+                const article = library.find((a) => a.slug === l.slug)!;
+                return (
+                  <li key={l.slug}>
+                    <Link
+                      href={{
+                        pathname: "/articles/" + l.slug + "/",
+                        query: { stage: id },
+                      }}
+                    >
+                      {article.title}
+                    </Link>
+                    <p>{l.task}</p>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        ))}
       </section>
       <section id="practice" className="panel road-panel">
         <h2>Репетиция</h2>

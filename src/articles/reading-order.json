@@ -59,6 +59,16 @@
     ]
   },
   {
+    "id": "jvm-gc",
+    "title": "JVM и сборка мусора",
+    "goal": "Проследите путь объекта через сборку и выберите коллектор по паузам, CPU и объёму памяти.",
+    "lessons": [
+      "gc-algorithms",
+      "java21-gc-choice"
+    ],
+    "track": "technical"
+  },
+  {
     "id": "transactions",
     "title": "Транзакции, MVCC и изоляция",
     "goal": "На двух соединениях проверьте, какие версии строк увидит каждая транзакция.",
@@ -95,6 +105,8 @@
     "lessons": [
       "btree-or-brin",
       "postgres-index-and-plan",
+      "postgres-index-design",
+      "postgres-plan-tuning",
       "n-plus-one-keyset",
       "diagnose-slow-relational-feed",
       "partitioning-and-sharding",
@@ -113,9 +125,21 @@
       "ddd-domain-vocabulary",
       "sparkjava-jooq-boundaries",
       "modular-monolith-extraction",
+      "microservices-pattern-selection",
+      "microservices-strangler-migration",
       "events-and-commands",
       "cqrs-read-write-models"
     ]
+  },
+  {
+    "id": "kafka",
+    "title": "Kafka: хранение и обработка событий",
+    "goal": "Разберите путь сообщения от производителя до группы потребителей и проверьте последствия сбоя.",
+    "lessons": [
+      "kafka-partitions-replication",
+      "kafka-groups-offsets"
+    ],
+    "track": "technical"
   },
   {
     "id": "events",
@@ -138,6 +162,18 @@
       "choreography-orchestration",
       "saga-compensation"
     ]
+  },
+  {
+    "id": "kubernetes",
+    "title": "Kubernetes для бэкенд-разработчика",
+    "goal": "Отправьте запрос в сервис, проверьте релиз под нагрузкой и локализуйте сбой по наблюдаемым признакам.",
+    "lessons": [
+      "kubernetes-service-path",
+      "kubernetes-release-checks",
+      "kubernetes-resources-load",
+      "kubernetes-pod-diagnosis"
+    ],
+    "track": "technical"
   },
   {
     "id": "design-practice",

@@ -1,7 +1,4 @@
-import guide from "./career-guide.json";
-import design from "./career-design.json";
-import data from "./career-data.json";
-import java from "./career-java.json";
+import { articles } from "./sources.mjs";
 import links from "./career-links.json";
 export interface PublicArticle {
   num: number;
@@ -13,12 +10,7 @@ export interface PublicArticle {
   ticket?: string;
 }
 export type ArticleListing = Omit<PublicArticle, "body" | "num">;
-export const library: PublicArticle[] = [
-  ...guide,
-  ...design,
-  ...data,
-  ...java,
-].sort((a, b) => a.num - b.num);
+export const library: PublicArticle[] = [...articles].sort((a,b)=>a.num-b.num);
 export const entries: ArticleListing[] = library.map(
   ({ slug, title, group, summary }) => ({ slug, title, group, summary }),
 );
