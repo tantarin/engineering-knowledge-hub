@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import {authorName,authorRole,siteName} from "../src/identity";
+import { TopicMenu } from "../src/articles/TopicMenu";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
@@ -291,6 +292,7 @@ export default function Page() {
             <strong>{siteName}</strong>
           </span>
         </div>
+        <TopicMenu onNavigate={() => A(false)} />
         <div className="nav-label">МОЯ БАЗА ЗНАНИЙ</div>
         {nav.map(([key, text, Icon], i) => (
           <div key={key}>

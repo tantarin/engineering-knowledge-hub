@@ -1,4 +1,6 @@
 import "./style.css";
+import { menuTopics } from "../src/articles/topic-menu";
+import { TopicsProvider } from "../src/articles/TopicMenu";
 import type { Metadata } from "next";
 import { siteName, authorName } from "../src/identity";
 export const metadata: Metadata = {
@@ -9,7 +11,7 @@ export const metadata: Metadata = {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru">
-      <body>{children}</body>
+      <body><TopicsProvider topics={menuTopics}>{children}</TopicsProvider></body>
     </html>
   );
 }
