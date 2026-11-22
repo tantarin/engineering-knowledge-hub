@@ -23,7 +23,7 @@ export function TopicMenu({ onNavigate }: { onNavigate?: () => void }) {
       const open = (expanded === undefined ? active?.title : expanded) === topic.title;
       return <div key={topic.title}>
         <button type="button" className="topic-toggle" aria-expanded={open} onClick={() => setExpanded(open ? null : topic.title)}>
-          <ChevronRight size={14} aria-hidden="true"/>{topic.title}
+          <ChevronRight size={14} aria-hidden="true"/><span>{topic.title}</span>
         </button>
         {open && <div className="topic-lessons">{topic.sections.map(section => <div key={section.title}>
           {topic.sections.length > 1 && <strong>{section.title}</strong>}
