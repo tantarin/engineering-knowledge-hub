@@ -1,4 +1,4 @@
-import { chapters } from "./library";
+import { chapters, entries } from "./library";
 import { articles } from "./concurrency";
 
 type Lesson = { title: string; href: string };
@@ -25,5 +25,15 @@ export const menuTopics: MenuTopic[] = [
   { title: "Spring", sections: [chapter("spring")] },
   { title: "Kubernetes и Helm", sections: [chapter("kubernetes")] },
   { title: "System Design", sections: [chapter("design-practice")] },
+  { title: "Базовое техническое интервью", sections: [{
+    title: "Подготовка к технической части",
+    lessons: [
+      "concurrency-and-parallelism", "race-conditions", "thread-pools",
+      "postgres-index-and-plan", "thread-safe-transfer", "java-interview-rehearsal",
+    ].map(slug => {
+      const article = entries.find(entry => entry.slug === slug)!;
+      return { title: article.title, href: `/articles/${slug}/` };
+    }),
+  }] },
   { title: "Карьера", sections: [chapter("job-search")] },
 ];
