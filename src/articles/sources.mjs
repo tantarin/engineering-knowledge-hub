@@ -6,6 +6,9 @@ import gc from "./career-gc.json" with { type: "json" };
 import storage from "./career-storage.json" with { type: "json" };
 import kubernetes from "./career-kubernetes.json" with { type: "json" };
 import microservices from "./career-microservices.json" with { type: "json" };
+import springAndHelm from "./career-frameworks.json" with { type: "json" };
+import messagingAndStorage from "./career-messaging.json" with { type: "json" };
+import streams from "./career-streams.json" with { type: "json" };
 export const articles = [
   ...guide,
   ...java,
@@ -15,4 +18,7 @@ export const articles = [
   ...storage,
   ...kubernetes,
   ...microservices,
+  ...springAndHelm,
+  ...messagingAndStorage,
+  ...streams,
 ];

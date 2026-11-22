@@ -92,6 +92,46 @@
         "section": "Нагрузка и инженерные стандарты"
       },
       {
+        "slug": "microservices-pattern-selection",
+        "task": "Сравните общую транзакцию в монолите с резервированием в двух сервисах.",
+        "section": "Микросервисная архитектура"
+      },
+      {
+        "slug": "microservices-strangler-migration",
+        "task": "Спланируйте миграцию одного чтения и назовите границу безопасного отката.",
+        "section": "Микросервисная архитектура"
+      },
+      {
+        "slug": "saga-compensation",
+        "task": "Объясните, что делать при отказе компенсации.",
+        "section": "Микросервисная архитектура"
+      },
+      {
+        "section": "Concurrency, JMM и parallel stream",
+        "slug": "happens-before",
+        "task": "Объясните публикацию объекта через volatile и границы гарантии."
+      },
+      {
+        "section": "Concurrency, JMM и parallel stream",
+        "slug": "java-sync-primitives",
+        "task": "Выберите между монитором, ReentrantLock и семафором для конкретного инварианта."
+      },
+      {
+        "section": "Concurrency, JMM и parallel stream",
+        "slug": "atomic-operations",
+        "task": "Покажите, какие шаги защищает CAS и где остаётся составная операция."
+      },
+      {
+        "section": "Concurrency, JMM и parallel stream",
+        "slug": "java-concurrent-collections",
+        "task": "Подберите коллекцию для очереди задач и частотного словаря."
+      },
+      {
+        "section": "Concurrency, JMM и parallel stream",
+        "slug": "java-parallel-stream",
+        "task": "Определите, безопасна ли редукция и как сравнить её с последовательной версией."
+      },
+      {
         "slug": "gc-algorithms",
         "task": "Нарисуйте граф ссылок и покажите, какие объекты удерживают память.",
         "section": "JVM и GC"
@@ -100,6 +140,31 @@
         "slug": "java21-gc-choice",
         "task": "Сравните сборщики при одинаковом heap и нагрузке. Выберите метрики для решения.",
         "section": "JVM и GC"
+      },
+      {
+        "section": "Spring для Java-вакансий",
+        "slug": "spring-bean-lifecycle",
+        "task": "Назовите точки расширения до создания экземпляра и после инициализации."
+      },
+      {
+        "section": "Spring для Java-вакансий",
+        "slug": "spring-transaction-proxy",
+        "task": "Разберите self-invocation, тип прокси и откат транзакции."
+      },
+      {
+        "section": "Spring для Java-вакансий",
+        "slug": "spring-async-scheduling",
+        "task": "Проследите транзакционную границу при смене потока и запуск задачи на двух репликах."
+      },
+      {
+        "section": "Spring для Java-вакансий",
+        "slug": "spring-boot-starter",
+        "task": "Объясните состав starter и условия создания bean по умолчанию."
+      },
+      {
+        "section": "Spring для Java-вакансий",
+        "slug": "spring-web-react",
+        "task": "Проведите запрос от React до Spring MVC или WebFlux. Выберите серверную модель для вызовов JDBC."
       },
       {
         "slug": "sql-isolation-levels-overview",
@@ -117,19 +182,14 @@
         "section": "PostgreSQL"
       },
       {
-        "slug": "microservices-pattern-selection",
-        "task": "Сравните общую транзакцию в монолите с резервированием в двух сервисах.",
-        "section": "Микросервисная архитектура"
+        "section": "PostgreSQL",
+        "slug": "postgres-views",
+        "task": "Сравните представление и материализованное представление по свежести, стоимости чтения и обновления."
       },
       {
-        "slug": "microservices-strangler-migration",
-        "task": "Спланируйте миграцию одного чтения и назовите границу безопасного отката.",
-        "section": "Микросервисная архитектура"
-      },
-      {
-        "slug": "saga-compensation",
-        "task": "Объясните, что делать при отказе компенсации.",
-        "section": "Микросервисная архитектура"
+        "section": "SQL, NoSQL и MongoDB",
+        "slug": "mongo-shard-key",
+        "task": "Выберите модель документов и ключ шардирования по доступу, росту и риску горячего шарда."
       },
       {
         "slug": "kafka-partitions-replication",
@@ -140,6 +200,16 @@
         "slug": "kafka-groups-offsets",
         "task": "Разберите сбой между записью результата и сохранением offset.",
         "section": "Kafka"
+      },
+      {
+        "section": "Kafka",
+        "slug": "kafka-consumer-capacity",
+        "task": "Рассчитайте число активных потребителей и партиций с запасом на пик и потерю экземпляра."
+      },
+      {
+        "section": "Kafka",
+        "slug": "kafka-rabbitmq",
+        "task": "Сравните журнал и рабочую очередь для двух групп читателей и повторной обработки."
       },
       {
         "slug": "kubernetes-service-path",
@@ -160,6 +230,16 @@
         "slug": "kubernetes-pod-diagnosis",
         "task": "Покажите порядок диагностики, когда новый Pod не принимает запросы.",
         "section": "Kubernetes и проверка релиза"
+      },
+      {
+        "section": "Kubernetes и проверка релиза",
+        "slug": "kubernetes-configuration",
+        "task": "Выберите контроллер, настройки контейнера и способы передачи конфигурации."
+      },
+      {
+        "section": "Kubernetes и проверка релиза",
+        "slug": "helm-release",
+        "task": "Прочтите Chart.yaml, values и шаблоны; проверьте манифест и назовите пределы отката."
       }
     ],
     "exercise": "В чистом Java-проекте реализуйте reserve(sku, quantity) для склада в памяти. Сначала договоритесь, что произойдёт при нехватке товара. Проверьте успешную бронь и отказ. Затем добавьте условие: два запроса могут прийти одновременно. Покажите, где принимается решение о последней единице. Через 30 минут остановите написание кода. Оставшиеся 30 минут разберите вопросы блока theory interview, возвращаясь к тому же решению.",

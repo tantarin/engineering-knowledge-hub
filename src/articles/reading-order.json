@@ -24,6 +24,7 @@
     "lessons": [
       "critical-sections",
       "java-sync-primitives",
+      "java-concurrent-collections",
       "atomic-operations",
       "read-write-locks",
       "producer-consumer",
@@ -46,6 +47,7 @@
       "thread-pools",
       "parallel-data-processing",
       "fork-join-pool",
+      "java-parallel-stream",
       "parallel-image-processing",
       "when-parallelism-does-not-help",
       "futures-and-async",
@@ -94,7 +96,8 @@
       "write-skew-invariant",
       "serialization-proof",
       "serializable-on-call",
-      "sql-transfer-interview"
+      "sql-transfer-interview",
+      "postgres-views"
     ]
   },
   {
@@ -110,6 +113,7 @@
       "n-plus-one-keyset",
       "diagnose-slow-relational-feed",
       "partitioning-and-sharding",
+      "mongo-shard-key",
       "replica-read-your-writes",
       "redis-cache-aside"
     ]
@@ -137,7 +141,9 @@
     "goal": "Разберите путь сообщения от производителя до группы потребителей и проверьте последствия сбоя.",
     "lessons": [
       "kafka-partitions-replication",
-      "kafka-groups-offsets"
+      "kafka-groups-offsets",
+      "kafka-consumer-capacity",
+      "kafka-rabbitmq"
     ],
     "track": "technical"
   },
@@ -164,12 +170,27 @@
     ]
   },
   {
+    "id": "spring",
+    "title": "Spring для Java-вакансий",
+    "goal": "Дополнительный раздел. Проследите создание bean и прокси, подключите starter и выберите модель исполнения HTTP-запроса.",
+    "track": "technical",
+    "lessons": [
+      "spring-bean-lifecycle",
+      "spring-transaction-proxy",
+      "spring-async-scheduling",
+      "spring-boot-starter",
+      "spring-web-react"
+    ]
+  },
+  {
     "id": "kubernetes",
     "title": "Kubernetes для бэкенд-разработчика",
     "goal": "Отправьте запрос в сервис, проверьте релиз под нагрузкой и локализуйте сбой по наблюдаемым признакам.",
     "lessons": [
       "kubernetes-service-path",
+      "kubernetes-configuration",
       "kubernetes-release-checks",
+      "helm-release",
       "kubernetes-resources-load",
       "kubernetes-pod-diagnosis"
     ],

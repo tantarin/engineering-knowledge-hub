@@ -60,8 +60,17 @@ export default async function StagePage({ params }: Props) {
       </section>
       <section>
         <h2>Порядок подготовки</h2>
+        {sections.length > 1 && (
+          <nav aria-label="Темы технического интервью" className="stage-topics">
+            {sections.map((group) => (
+              <a href={"#topic-" + group.lessons[0].slug} key={group.title}>
+                {group.title}
+              </a>
+            ))}
+          </nav>
+        )}
         {sections.map((section) => (
-          <div key={section.title}>
+          <div key={section.title} id={"topic-" + section.lessons[0].slug}>
             {section.title && <h3>{section.title}</h3>}
             <ol className="stage-lessons">
               {section.lessons.map((l) => {
