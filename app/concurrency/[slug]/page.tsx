@@ -1,5 +1,6 @@
 import { siteName } from "../../../src/identity";
 import Link from "next/link";
+import { InterviewAnswer, LockScenarios } from "../../../src/articles/LockExamples";
 import { notFound } from "next/navigation";
 import { articles } from "../../../src/articles/concurrency";
 import hljs from "highlight.js/lib/core";
@@ -43,6 +44,7 @@ export default async function Article({ params }: Props) {
           <p>{a.lead}</p>
         </header>
         <div className="article-body">
+          {a.previousLesson && <Link href={"/concurrency/" + a.previousLesson.slug + "/"}>{a.previousLesson.title}</Link>}
           {a.introduction && <>
             <h2>{a.introduction.heading}</h2>
             <p>{a.introduction.before}</p>
@@ -63,8 +65,18 @@ export default async function Article({ params }: Props) {
           <p>{a.analysis}</p>
           {a.walkthrough?.map(step => <section key={step.heading}>
             <h2>{step.heading}</h2><p>{step.text}</p>
+            {step.code && <JavaExample code={step.code} />}
+            {step.scenarios && <LockScenarios />}
               {step.illustration && <img src={`../../illustrations/${step.illustration.file}`} alt={step.illustration.alt} style={{ width: "100%", height: "auto" }} />}
           </section>)}
+          {a.comparison && <section>
+            <h2>Когда выбрать synchronized, а когда ReentrantLock?</h2>
+            <p>Для последовательности setText() и print() достаточно synchronized. Требование «подождать максимум 50 мс» даёт конкретную причину выбрать ReentrantLock.</p>
+            <div style={{ overflowX: "auto" }}><table>
+              <thead><tr><th>Возможность</th><th>synchronized</th><th>ReentrantLock</th></tr></thead>
+              <tbody>{a.comparison.map(row => <tr key={row.feature}><th scope="row">{row.feature}</th><td>{row.monitor}</td><td>{row.lock}</td></tr>)}</tbody>
+            </table></div>
+          </section>}
           {a.glossary && <section id="methods">
             <h2>Методы CompletableFuture на примерах</h2>
             <dl>{a.glossary.map(({ method, explanation }) => (
@@ -85,6 +97,7 @@ export default async function Article({ params }: Props) {
               <summary>{q.question}</summary><p>{q.answer}</p>
             </details>)}
           </section>
+          {a.englishAnswer && <InterviewAnswer answer={a.englishAnswer} />}
           <p>
             <a href={a.source} rel="noreferrer" target="_blank">
               Первоисточник ·{" "}

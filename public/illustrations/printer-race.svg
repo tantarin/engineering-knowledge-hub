@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 225" role="img" aria-labelledby="title">
+<title id="title">Поток B меняет текст до того, как A печатает этикетку</title>
+<rect width="640" height="225" rx="14" fill="#f5f7fb"/>
+<g font-family="system-ui, sans-serif" fill="#192943">
+<text x="20" y="33" font-size="20" font-weight="650">Две задачи · один текст в памяти принтера</text>
+<g font-size="16" font-weight="600"><text x="25" y="70">Шаг</text><text x="100" y="70">Кто и что делает</text><text x="435" y="70">Текст принтера</text></g>
+<rect x="15" y="82" width="610" height="36" rx="6" fill="#dce9f8"/>
+<rect x="15" y="125" width="610" height="36" rx="6" fill="#d6eee3"/>
+<rect x="15" y="168" width="610" height="40" rx="6" fill="#ffedcf"/>
+<g font-size="17"><text x="30" y="107">1</text><text x="100" y="107">A задаёт текст для коробки 101</text><text x="435" y="107">Заказ 101</text>
+<text x="30" y="150">2</text><text x="100" y="150">B задаёт текст для коробки 102</text><text x="435" y="150">Заказ 102</text>
+<text x="30" y="194">3</text><text x="100" y="194">A печатает для коробки 101</text><text x="435" y="194" font-weight="700">Заказ 102</text></g></g></svg>
