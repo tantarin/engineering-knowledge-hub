@@ -56,9 +56,13 @@ export default async function Article({ params }: Props) {
             </section>}
             <h2>{a.introduction.nextHeading}</h2>
           </>}
+          {a.beforeExample && <section><h2>{a.beforeExample.heading}</h2><p>{a.beforeExample.text}</p></section>}
           <p>{a.scenario}</p>
           <JavaExample code={a.code} />
           <p>{a.analysis}</p>
+          {a.walkthrough?.map(step => <section key={step.heading}>
+            <h2>{step.heading}</h2><p>{step.text}</p>
+          </section>)}
           {a.glossary && <section id="methods">
             <h2>Методы CompletableFuture на примерах</h2>
             <dl>{a.glossary.map(({ method, explanation }) => (
@@ -75,6 +79,9 @@ export default async function Article({ params }: Props) {
               <summary>Сверить ответ</summary>
               <p>{a.answer}</p>
             </details>
+            {a.extraQuestions?.map(q => <details key={q.question}>
+              <summary>{q.question}</summary><p>{q.answer}</p>
+            </details>)}
           </section>
           <p>
             <a href={a.source} rel="noreferrer" target="_blank">
