@@ -1,3 +1,4 @@
+import { InterviewAnswer } from "../../../src/articles/LockExamples";
 import { siteName } from "../../../src/identity";
 import { Suspense } from "react";
 import StagePager from "../../../src/articles/StagePager";
@@ -68,6 +69,7 @@ export default async function ReadArticle({ params }: Props) {
         </header>
         <div className="article-body md">
           <Markdown remarkPlugins={[remarkGfm]}>{a.body}</Markdown>
+          {a.interview && <InterviewAnswer {...a.interview} />}
         </div>
         {a.ticket && (
           <Link href={"/#roadmap/" + a.ticket}>

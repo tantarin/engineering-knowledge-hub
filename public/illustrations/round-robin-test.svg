@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 224" role="img" aria-labelledby="title"><title id="title">Один балансировщик для всех работников</title><rect width="660" height="224" rx="16" fill="#f4f7fb"/><g font-family="system-ui,sans-serif" fill="#192943"><text x="20" y="37" font-size="22" font-weight="650">Один балансировщик для всех работников</text>
+<rect x="16" y="55" width="628" height="45" rx="9" fill="#dae8fa"/><text x="30" y="84" font-size="19" font-weight="650">Общий старт</text><text x="197" y="84" font-size="19">8 работников ждут сигнала</text>
+<rect x="16" y="108" width="628" height="45" rx="9" fill="#d7eee4"/><text x="30" y="137" font-size="19" font-weight="650">Выбор сервера</text><text x="197" y="137" font-size="19">8 × 25 вызовов next() = 200</text>
+<rect x="16" y="161" width="628" height="45" rx="9" fill="#f6e7c9"/><text x="30" y="190" font-size="19" font-weight="650">Проверка</text><text x="197" y="190" font-size="19">100 выборов A    +    100 выборов B</text>
+</g></svg>

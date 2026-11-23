@@ -8,6 +8,7 @@ export interface PublicArticle {
   summary: string;
   body: string;
   ticket?: string;
+  interview?: { question: string; answer: string };
 }
 export type ArticleListing = Omit<PublicArticle, "body" | "num">;
 export const library: PublicArticle[] = [...articles].sort((a,b)=>a.num-b.num);
