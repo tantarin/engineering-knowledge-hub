@@ -59,6 +59,15 @@ export default async function Article({ params }: Props) {
           <p>{a.scenario}</p>
           <JavaExample code={a.code} />
           <p>{a.analysis}</p>
+          {a.glossary && <section id="methods">
+            <h2>Методы CompletableFuture на примерах</h2>
+            <dl>{a.glossary.map(({ method, explanation }) => (
+              <div key={method}>
+                <dt><code>{method}</code></dt>
+                <dd><p>{explanation}</p></dd>
+              </div>
+            ))}</dl>
+          </section>}
           <section className="panel road-panel">
             <h2>Вопрос для самопроверки</h2>
             <p>{a.question}</p>
