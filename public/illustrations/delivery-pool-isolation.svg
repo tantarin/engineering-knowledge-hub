@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 425" role="img" aria-labelledby="title"><title id="title">Четыре потока: общий пул и разделение на три плюс один</title><g font-family="system-ui, sans-serif">
+<rect x="0" y="0" width="680" height="425" rx="10" fill="#f7f9fc"/>
+<text x="20" y="33" font-size="24" font-weight="700" fill="#172d48">Один общий пул</text>
+<rect x="16" y="50" width="648" height="88" rx="10" fill="#d9e8fa"/>
+<text x="28" y="80" font-size="17" font-weight="450" fill="#172d48">Поток 1</text>
+<text x="28" y="114" font-size="20" font-weight="650" fill="#172d48">Доставка 1</text>
+<text x="190" y="80" font-size="17" font-weight="450" fill="#172d48">Поток 2</text>
+<text x="190" y="114" font-size="20" font-weight="650" fill="#172d48">Доставка 2</text>
+<text x="352" y="80" font-size="17" font-weight="450" fill="#172d48">Поток 3</text>
+<text x="352" y="114" font-size="20" font-weight="650" fill="#172d48">Доставка 3</text>
+<text x="514" y="80" font-size="17" font-weight="450" fill="#172d48">Поток 4</text>
+<text x="514" y="114" font-size="20" font-weight="650" fill="#172d48">Доставка 4</text>
+<text x="21" y="170" font-size="19" font-weight="450" fill="#172d48">В очереди общего пула: проверка корзины.</text>
+<text x="20" y="233" font-size="24" font-weight="700" fill="#172d48">Два пула · те же четыре потока</text>
+<rect x="16" y="250" width="480" height="88" rx="10" fill="#d9e8fa"/>
+<rect x="504" y="250" width="160" height="88" rx="10" fill="#c8efda"/>
+<text x="28" y="280" font-size="17" font-weight="450" fill="#172d48">Поток 1</text>
+<text x="28" y="314" font-size="20" font-weight="650" fill="#172d48">Доставка 1</text>
+<text x="190" y="280" font-size="17" font-weight="450" fill="#172d48">Поток 2</text>
+<text x="190" y="314" font-size="20" font-weight="650" fill="#172d48">Доставка 2</text>
+<text x="352" y="280" font-size="17" font-weight="450" fill="#172d48">Поток 3</text>
+<text x="352" y="314" font-size="20" font-weight="650" fill="#172d48">Доставка 3</text>
+<text x="514" y="280" font-size="17" font-weight="450" fill="#172d48">Поток 4</text>
+<text x="514" y="314" font-size="20" font-weight="650" fill="#172d48">Корзина</text>
+<text x="21" y="370" font-size="19" font-weight="450" fill="#172d48">В очереди доставки: четвёртый заказ.</text>
+<text x="21" y="401" font-size="19" font-weight="650" fill="#172d48">Проверка корзины уже выполняется.</text>
+</g></svg>
