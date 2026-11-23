@@ -48,6 +48,12 @@ export default async function Article({ params }: Props) {
             <p>{a.introduction.before}</p>
             <JavaExample code={a.introduction.code} />
             <p>{a.introduction.after}</p>
+            {a.introduction.followUp && <section>
+              <h2>{a.introduction.followUp.heading}</h2>
+              <p>{a.introduction.followUp.text}</p>
+              <JavaExample code={a.introduction.followUp.code} />
+              <p>{a.introduction.followUp.explanation}</p>
+            </section>}
             <h2>{a.introduction.nextHeading}</h2>
           </>}
           <p>{a.scenario}</p>
