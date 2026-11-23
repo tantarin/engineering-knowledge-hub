@@ -48,6 +48,7 @@ export default async function Article({ params }: Props) {
             <p>{a.introduction.before}</p>
             <JavaExample code={a.introduction.code} />
             <p>{a.introduction.after}</p>
+              {a.introduction.illustration && <img src={`../../illustrations/${a.introduction.illustration.file}`} alt={a.introduction.illustration.alt} style={{ width: "100%", height: "auto" }} />}
             {a.introduction.followUp && <section>
               <h2>{a.introduction.followUp.heading}</h2>
               <p>{a.introduction.followUp.text}</p>
@@ -62,6 +63,7 @@ export default async function Article({ params }: Props) {
           <p>{a.analysis}</p>
           {a.walkthrough?.map(step => <section key={step.heading}>
             <h2>{step.heading}</h2><p>{step.text}</p>
+              {step.illustration && <img src={`../../illustrations/${step.illustration.file}`} alt={step.illustration.alt} style={{ width: "100%", height: "auto" }} />}
           </section>)}
           {a.glossary && <section id="methods">
             <h2>Методы CompletableFuture на примерах</h2>
