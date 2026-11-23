@@ -5,6 +5,12 @@ import { articles } from "../../../src/articles/concurrency";
 import hljs from "highlight.js/lib/core";
 import java from "highlight.js/lib/languages/java";
 hljs.registerLanguage("java", java);
+function JavaExample({ code }: { code: string }) {
+  return <pre><code dangerouslySetInnerHTML={{
+    __html: hljs.highlight(code, { language: "java" }).value,
+  }} /></pre>;
+}
+
 export const dynamicParams = false;
 export function generateStaticParams() {
   return articles.map(({ slug }) => ({ slug }));
@@ -37,14 +43,15 @@ export default async function Article({ params }: Props) {
           <p>{a.lead}</p>
         </header>
         <div className="article-body">
+          {a.introduction && <>
+            <h2>{a.introduction.heading}</h2>
+            <p>{a.introduction.before}</p>
+            <JavaExample code={a.introduction.code} />
+            <p>{a.introduction.after}</p>
+            <h2>{a.introduction.nextHeading}</h2>
+          </>}
           <p>{a.scenario}</p>
-          <pre>
-            <code
-              dangerouslySetInnerHTML={{
-                __html: hljs.highlight(a.code, { language: "java" }).value,
-              }}
-            />
-          </pre>
+          <JavaExample code={a.code} />
           <p>{a.analysis}</p>
           <section className="panel road-panel">
             <h2>Вопрос для самопроверки</h2>

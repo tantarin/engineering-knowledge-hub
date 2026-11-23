@@ -6,6 +6,7 @@ export interface Article {
   group: string;
   title: string;
   lead: string;
+  introduction?: { heading: string; before: string; code: string; after: string; nextHeading: string };
   scenario: string;
   code: string;
   analysis: string;
@@ -163,8 +164,20 @@ export const articles: Article[] = [
   {
     slug: "completable-future",
     group: "Выполнение задач",
-    title: "CompletableFuture и зависимые запросы",
-    lead: "Когда второй запрос зависит от результата первого, цепочку удобно описать через thenCompose. Работнику не приходится блокироваться на join внутри цепочки.",
+    title: "Что такое CompletableFuture и как связать два запроса",
+    lead: "CompletableFuture<T> — это объект Java, через который код получает результат операции. T обозначает тип результата. Например, метод возвращает CompletableFuture<Price> сразу, пока сервис цен ещё считает стоимость. Когда ответ придёт, объект завершится значением Price. Если запрос сорвётся, он может завершиться с ошибкой.",
+    introduction: {
+      heading: "Как появляется результат",
+      before: "Представим, что мы сами играем роль сервиса цен. Создадим объект для будущей цены, укажем, как посчитать стоимость двух билетов, а затем вручную сообщим цену одного билета.",
+      code: `var ticketPrice = new CompletableFuture<Integer>();
+var total = ticketPrice.thenApply(price -> price * 2);
+
+System.out.println(total.isDone()); // false
+ticketPrice.complete(500);
+System.out.println(total.join());   // 1000`,
+      after: "В первой строке ещё нет цены. Создание объекта само по себе не запускает вычисление. Во второй строке thenApply запоминает, что сделать с ценой, когда она появится, и возвращает отдельный объект для суммы. Вызов complete(500) передаёт цену и позволяет вычислить сумму. Последняя строка читает готовое значение. Если в этом однопоточном примере перенести join() перед complete(500), поток остановится в ожидании и до complete не дойдёт.",
+      nextHeading: "Как связать запрос профиля с запросом цены",
+    },
     scenario:
       "Чтобы получить цену, нужно сначала найти профиль клиента, затем запросить тариф его региона. Оба клиента уже возвращают CompletableFuture. Если вызвать thenApply с функцией, которая тоже возвращает future, получится вложенная оболочка.",
     code: "CompletableFuture<Price> priceFor(String id) {\n    return profiles.find(id)\n        .thenCompose(p -> prices.fetch(p.region()))\n        .thenApply(Price::withTax);\n}",
