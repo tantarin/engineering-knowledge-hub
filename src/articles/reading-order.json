@@ -10,6 +10,7 @@
       "concurrency-and-parallelism",
       "cpu-and-io-bound",
       "multithreading-field-guide",
+      "executor-supplyasync-and-join",
       "concurrent-api-requests",
       "race-conditions",
       "immutable-shared-state",

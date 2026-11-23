@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 260" role="img" aria-labelledby="title">
+<title id="title">Четыре занятых рабочих потока и один заказ в очереди</title>
+<rect width="680" height="260" rx="16" fill="#f5f7fb"/>
+<g font-family="system-ui, sans-serif" fill="#192943">
+<text x="22" y="38" font-size="24" font-weight="650">Пул из четырёх потоков</text>
+<rect x="22" y="72" width="160" height="150" rx="12" fill="#fff2d2"/>
+<text x="40" y="103" font-size="19">Очередь</text>
+<text x="40" y="148" font-size="22" font-weight="650">Заказ 5</text>
+<text x="40" y="182" font-size="16">ждёт потока</text>
+<path d="M188 147h80m-9 -7 9 7-9 7" stroke="#405876" fill="none" stroke-width="3"/>
+<g fill="#d9e8fa">
+<rect x="282" y="63" width="374" height="39" rx="8"/><rect x="282" y="109" width="374" height="39" rx="8"/><rect x="282" y="155" width="374" height="39" rx="8"/><rect x="282" y="201" width="374" height="39" rx="8"/>
+</g>
+<g font-size="19"><text x="302" y="89">Поток 1</text><text x="302" y="135">Поток 2</text><text x="302" y="181">Поток 3</text><text x="302" y="227">Поток 4</text></g>
+<g fill="#224573" font-size="19"><text x="466" y="89">выполняет заказ 1</text><text x="466" y="135">выполняет заказ 2</text><text x="466" y="181">выполняет заказ 3</text><text x="466" y="227">выполняет заказ 4</text></g></g></svg>
