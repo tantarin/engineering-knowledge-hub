@@ -1,3 +1,4 @@
+import { DeadlockLesson } from "../../../src/articles/DeadlockLesson";
 import { siteName } from "../../../src/identity";
 import Link from "next/link";
 import { InterviewAnswer, LockScenarios } from "../../../src/articles/LockExamples";
@@ -44,6 +45,7 @@ export default async function Article({ params }: Props) {
           <p>{a.lead}</p>
         </header>
         <div className="article-body">
+          {slug === "deadlocks" ? <DeadlockLesson article={a} /> : <>
           {a.previousLesson && <Link href={"/concurrency/" + a.previousLesson.slug + "/"}>{a.previousLesson.title}</Link>}
           {a.introduction && <>
             <h2>{a.introduction.heading}</h2>
@@ -113,6 +115,7 @@ export default async function Article({ params }: Props) {
               Проверить навык в Learning Roadmap
             </Link>
           )}
+          </>}
         </div>
       </article>
       <footer>

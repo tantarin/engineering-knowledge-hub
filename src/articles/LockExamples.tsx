@@ -14,7 +14,7 @@ export function LockScenarios() {
   </fieldset>;
 }
 
-export function InterviewAnswer({ answer }: { answer: string }) {
+export function InterviewAnswer({ answer, question = "What is the difference between synchronized and ReentrantLock?" }: { answer: string; question?: string }) {
   const [status, setStatus] = useState("");
   async function copy() {
     try {
@@ -25,7 +25,7 @@ export function InterviewAnswer({ answer }: { answer: string }) {
     }
   }
   return <section lang="en"><h2 lang="ru">Короткий ответ на английском</h2>
-    <p><strong>What is the difference between synchronized and ReentrantLock?</strong></p>
+    <p><strong>{question}</strong></p>
     <p>{answer}</p>
     <button type="button" onClick={copy}>Copy answer</button>{" "}
     <span lang="ru" role="status">{status}</span>
