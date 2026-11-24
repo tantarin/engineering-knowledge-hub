@@ -6,6 +6,7 @@
     "track": "technical",
     "lessons": [
       "threads-and-processes",
+      "how-java-threads-share-cpu",
       "thread-lifecycle",
       "concurrency-and-parallelism",
       "cpu-and-io-bound",

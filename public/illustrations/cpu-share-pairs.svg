@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 316" role="img" aria-labelledby="title"><title id="title">Как делятся два логических CPU</title><rect width="100%" height="100%" rx="14" fill="#f5f7fb"/><g font-family="system-ui,sans-serif" fill="#192943"><text x="18" y="32" font-size="20" font-weight="650">Как делятся два логических CPU</text>
+<text x="14" y="77" font-size="16">2 потока · CPU 1</text>
+<rect x="230.0" y="50" width="428.0" height="40" rx="5" fill="#26598d"/><text x="445.0" y="76" text-anchor="middle" fill="white" font-size="17">A</text>
+<text x="14" y="141" font-size="16">2 потока · CPU 2</text>
+<rect x="230.0" y="114" width="428.0" height="40" rx="5" fill="#287059"/><text x="445.0" y="140" text-anchor="middle" fill="white" font-size="17">B</text>
+<text x="14" y="205" font-size="16">6 потоков · CPU 1</text>
+<rect x="230.0" y="178" width="141.33333333333334" height="40" rx="5" fill="#26598d"/><text x="301.6666666666667" y="204" text-anchor="middle" fill="white" font-size="17">A</text>
+<rect x="373.33333333333337" y="178" width="141.33333333333334" height="40" rx="5" fill="#694f88"/><text x="445.00000000000006" y="204" text-anchor="middle" fill="white" font-size="17">C</text>
+<rect x="516.6666666666667" y="178" width="141.33333333333334" height="40" rx="5" fill="#286977"/><text x="588.3333333333334" y="204" text-anchor="middle" fill="white" font-size="17">E</text>
+<text x="14" y="269" font-size="16">6 потоков · CPU 2</text>
+<rect x="230.0" y="242" width="141.33333333333334" height="40" rx="5" fill="#287059"/><text x="301.6666666666667" y="268" text-anchor="middle" fill="white" font-size="17">B</text>
+<rect x="373.33333333333337" y="242" width="141.33333333333334" height="40" rx="5" fill="#955f20"/><text x="445.00000000000006" y="268" text-anchor="middle" fill="white" font-size="17">D</text>
+<rect x="516.6666666666667" y="242" width="141.33333333333334" height="40" rx="5" fill="#714e64"/><text x="588.3333333333334" y="268" text-anchor="middle" fill="white" font-size="17">F</text>
+</g></svg>

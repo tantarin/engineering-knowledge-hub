@@ -1,4 +1,4 @@
-import { ImportCancellationQuiz } from "../../../src/articles/ImportCancellationQuiz";
+import { ImportCancellationQuiz, Question } from "../../../src/articles/ImportCancellationQuiz";
 import { InterviewAnswer } from "../../../src/articles/LockExamples";
 import { siteName } from "../../../src/identity";
 import { Suspense } from "react";
@@ -78,6 +78,14 @@ export default async function ReadArticle({ params }: Props) {
             </details>
           </>}
           {slug === "import-cancel-after-commit" && <ImportCancellationQuiz />}
+          {slug === "thread-lifecycle" && <section><h2>Проверь понимание</h2>
+            <Question item={{
+              prompt: "100 потоков RUNNABLE, CPU — 5%, задержка HTTP выросла. Что проверить в первую очередь?",
+              options: ["Добавить CPU", "Снять дампы, сравнить CPU time и проверить профиль потоков", "Увеличить пул в десять раз"],
+              correct: 1,
+              reason: "Число RUNNABLE не указывает причину задержки. Стеки, прирост CPU time и метрики за один интервал помогут отличить вычисления от ожидания."
+            }} />
+          </section>}
           {a.interview && <InterviewAnswer {...a.interview} />}
         </div>
         {a.ticket && (

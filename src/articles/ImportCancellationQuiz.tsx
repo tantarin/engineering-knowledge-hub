@@ -20,11 +20,11 @@ const questions = [
   },
 ];
 
-function Question({ item, index }: { item: typeof questions[number]; index: number }) {
+export function Question({ item }: { item: typeof questions[number] }) {
   const [selected, select] = useState<number>();
   return <fieldset><legend>{item.prompt}</legend>
     {item.options.map((option, i) => <label key={option} style={{display:"block"}}>
-      <input type="radio" name={`import-question-${index}`} checked={selected === i} onChange={() => select(i)} /> {option}
+      <input type="radio" name={item.prompt} checked={selected === i} onChange={() => select(i)} /> {option}
     </label>)}
     <p role="status">{selected !== undefined && (selected === item.correct ? "Верно. " : "Попробуй ещё раз. ") + item.reason}</p>
   </fieldset>;
@@ -32,6 +32,6 @@ function Question({ item, index }: { item: typeof questions[number]; index: numb
 
 export function ImportCancellationQuiz() {
   return <section><h2>Проверь понимание</h2>
-    {questions.map((item, index) => <Question key={item.prompt} item={item} index={index} />)}
+    {questions.map(item => <Question key={item.prompt} item={item} />)}
   </section>;
 }
