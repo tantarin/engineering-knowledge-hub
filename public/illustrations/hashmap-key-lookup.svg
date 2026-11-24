@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 230" role="img" aria-labelledby="title"><title id="title">Поиск по ключу OrderKey(101) с равенством по номеру заказа</title><rect width="640" height="230" rx="14" fill="#f5f7fb"/><g font-family="system-ui,sans-serif" fill="#192943"><text x="18" y="33" font-size="21" font-weight="650">get(new OrderKey(101))</text>
+<rect x="20" y="53" width="600" height="42" rx="8" fill="#dce9fa"/><text x="34" y="81" font-size="18">1 · hashCode() ключа → корзина для поиска</text>
+<path d="M48 96v10m-4 -4 4 4 4 -4" fill="none" stroke="#405876" stroke-width="2"/>
+<rect x="20" y="108" width="600" height="42" rx="8" fill="#fae6c7"/><text x="34" y="135" font-size="18">2 · Сравнение с сохранённым ключом: id 101 = id 101</text>
+<path d="M48 151v10m-4 -4 4 4 4 -4" fill="none" stroke="#405876" stroke-width="2"/>
+<rect x="20" y="163" width="600" height="42" rx="8" fill="#d6eee4"/><text x="34" y="191" font-size="18">3 · Найдена запись → возвращаем PAID</text></g></svg>

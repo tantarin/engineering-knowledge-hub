@@ -13,6 +13,7 @@ function chapter(id: string): Section {
 const storage = chapter("queries-storage");
 const isNoSQL = (lesson: Lesson) => ["/articles/mongo-shard-key/", "/articles/redis-cache-aside/"].includes(lesson.href);
 export const menuTopics: MenuTopic[] = [
+  { title: "Java Core", sections: [chapter("java-core")] },
   { title: "Java · многопоточность", sections: [
     chapter("java-basics"), chapter("synchronization"), chapter("executors"),
     { title: "Практикум Java", lessons: articles.map(a => ({ title: a.title, href: `/concurrency/${a.slug}/` })) },
