@@ -15,6 +15,7 @@
       "concurrent-api-requests",
       "race-conditions",
       "immutable-shared-state",
+      "route-snapshot-updates",
       "happens-before"
     ]
   },

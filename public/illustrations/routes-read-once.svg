@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 670 202" role="img" aria-labelledby="title"><title id="title">Откуда взяты индекс и элемент?</title><rect width="670" height="202" rx="16" fill="#f5f7fb"/><g font-family="system-ui,sans-serif" fill="#192943"><text x="17" y="32" font-size="21" font-weight="650">Откуда взяты индекс и элемент?</text>
+<rect x="15" y="51" width="640" height="39" rx="7" fill="#d9e9fa"/><text x="28" y="76" font-size="17" font-weight="650">Два чтения</text><text x="193" y="76" font-size="17">V1: size() = 3 → индекс 2</text>
+<rect x="15" y="100" width="640" height="39" rx="7" fill="#fae6c7"/><text x="28" y="125" font-size="17" font-weight="650">После замены</text><text x="193" y="125" font-size="17">V2: get(2) → индекс вне границ</text>
+<rect x="15" y="149" width="640" height="39" rx="7" fill="#d6eee4"/><text x="28" y="174" font-size="17" font-weight="650">Одно чтение</text><text x="193" y="174" font-size="17">V1: size() = 3 → V1: get(2) → server-C</text>
+</g></svg>
