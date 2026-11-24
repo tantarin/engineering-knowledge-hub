@@ -69,6 +69,13 @@ export default async function ReadArticle({ params }: Props) {
         </header>
         <div className="article-body md">
           <Markdown remarkPlugins={[remarkGfm]}>{a.body}</Markdown>
+          {a.sqlExercise && <>
+            <details><summary>Подсказка</summary><p>{a.sqlExercise.hint}</p></details>
+            <details><summary>Показать решение</summary>
+              <pre><code>{a.sqlExercise.solution}</code></pre>
+              <p>{a.sqlExercise.explanation}</p>
+            </details>
+          </>}
           {a.interview && <InterviewAnswer {...a.interview} />}
         </div>
         {a.ticket && (

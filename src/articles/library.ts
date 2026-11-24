@@ -8,6 +8,7 @@ export interface PublicArticle {
   summary: string;
   body: string;
   ticket?: string;
+  sqlExercise?: { hint: string; solution: string; explanation: string };
   interview?: { question: string; answer: string };
 }
 export type ArticleListing = Omit<PublicArticle, "body" | "num">;

@@ -107,6 +107,7 @@
     "goal": "Найдите причину медленного запроса, затем проследите свежесть ответа на реплике и в кэше.",
     "track": "technical",
     "lessons": [
+      "sql-clients-with-more-than-five-orders",
       "btree-or-brin",
       "postgres-index-and-plan",
       "postgres-index-design",
