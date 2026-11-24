@@ -1,3 +1,4 @@
+import { ImportCancellationQuiz } from "../../../src/articles/ImportCancellationQuiz";
 import { InterviewAnswer } from "../../../src/articles/LockExamples";
 import { siteName } from "../../../src/identity";
 import { Suspense } from "react";
@@ -76,6 +77,7 @@ export default async function ReadArticle({ params }: Props) {
               <p>{a.sqlExercise.explanation}</p>
             </details>
           </>}
+          {slug === "import-cancel-after-commit" && <ImportCancellationQuiz />}
           {a.interview && <InterviewAnswer {...a.interview} />}
         </div>
         {a.ticket && (

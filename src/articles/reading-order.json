@@ -55,6 +55,8 @@
       "java21-virtual-threads",
       "executors-futures-virtual-threads",
       "task-cancellation",
+      "import-thread-interrupt",
+      "import-cancel-after-commit",
       "bounded-external-concurrency",
       "concurrent-round-robin",
       "tdd-concurrent-code",
