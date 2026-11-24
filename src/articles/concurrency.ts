@@ -13,6 +13,7 @@ export interface Article {
   previousLesson?: { slug: string; title: string };
   comparison?: { feature: string; monitor: string; lock: string }[];
   englishAnswer?: string;
+  englishQuestion?: string;
   extraQuestions?: { question: string; answer: string }[];
   scenario: string;
   code: string;
@@ -58,18 +59,88 @@ export const articles: Article[] = [
   {
     slug: "happens-before",
     group: "Общая память",
-    title: "Java Memory Model и happens-before",
-    lead: "Чтобы другой поток увидел подготовленный объект, нужна связь между записью и чтением. Одного хронологического порядка в логах недостаточно.",
-    scenario:
-      "Фоновый поток загружает конфигурацию, после чего обработчик может читать её без блокировки. Рассмотрим одноразовую публикацию, когда записывающий поток один и после загрузки объект больше не меняется.",
-    code: "private Config config;\nprivate volatile boolean ready;\n\nvoid publish(Config value) {\n    config = value;\n    ready = true;\n}\n\nConfig current() {\n    return ready ? config : null;\n}",
-    analysis:
-      "Запись config предшествует записи ready в порядке программы. Запись volatile-поля образует связь synchronizes-with с последующим чтением этого поля. Если обработчик увидел true, транзитивность happens-before связывает подготовку config с его использованием. Для регулярной замены конфигурации проще публиковать новую неизменяемую версию через одну volatile-ссылку: тогда читатель получает один согласованный снимок.",
-    question:
-      "Можно ли после публикации свободно менять обычный ArrayList внутри Config?",
-    answer:
-      "Нет. Гарантия публикации охватывает изменения, сделанные до записи ready. Последующим конкурентным изменениям списка требуется собственная синхронизация либо замена списка новой неизменяемой версией.",
-    source: jls,
+    title: "Java Memory Model: почему потоки могут видеть разные значения?",
+    lead: "Фоновый поток загрузил настройки базы данных: адрес db-a и лимит в 20 соединений. Через мгновение HTTP-обработчик читает настройки. Может ли он по-прежнему получить null? Посмотрим, что именно в коде даёт ему право рассчитывать на готовые данные.",
+    introduction: {
+      heading: "1. Достаточно ли положить объект в общее поле?",
+      before: "Оба потока уже запущены и используют один экземпляр хранилища настроек. Загрузчик вызывает initialize(), обработчик — current(). Пока никакой другой синхронизации между ними нет.",
+      code: `class Config {
+    String databaseUrl;
+    int maxConnections;
+}
+
+private Config config;
+
+void initialize() {
+    Config value = new Config();
+    value.databaseUrl = "db-a";
+    value.maxConnections = 20;
+    config = value;
+}
+
+Config current() {
+    return config;
+}`,
+      after: "Для загрузчика всё последовательно: сначала заполнить поля, затем сохранить ссылку. Но что увидит обработчик? Ему разрешено прочитать прежнее значение ссылки — null. Даже если он увидит новый объект, для его обычных полей в этом примере нет гарантии, что обработчик увидит именно db-a и 20. Например, чтение maxConnections может дать начальное значение 0. Это возможные исходы, а не обязательный результат каждого запуска.",
+      nextHeading: "2. Почему запись в логе «загрузка завершена» не решает задачу?",
+    },
+    scenario: "Видимость (visibility) — вопрос о том, какую запись может увидеть другой поток при чтении. Метки времени помогают восстановить ход запроса, но сами по себе не связывают запись и чтение в программе. Допустимые наблюдения определяет Java Memory Model (JMM). Чтобы получить гарантию, добавим явный сигнал. В следующем варианте один загрузчик один раз передаёт полностью подготовленный объект и больше его не меняет. Флаг ready изначально равен false.",
+    code: `private Config config;
+private volatile boolean ready;
+
+void publish(Config value) {
+    config = value;
+    ready = true;
+}
+
+Config current() {
+    if (!ready) return null;
+    return config;
+}`,
+    analysis: "Загрузчик выставляет ready только после подготовки объекта и записи ссылки. Обработчик сначала проверяет флаг. Пока он читает false, метод возвращает null. Как только он прочитал true, метод идёт дальше. Почему теперь можно доверять и ссылке, и числу 20 внутри объекта?",
+    walkthrough: [
+      { heading: "3. Как сигнал связывает два потока?", text: "У правил JMM для таких рассуждений есть название — happens-before. Начни со строки, где загрузчик записал 20, и пройди по стрелкам на схеме. Внутри каждого потока связь даёт порядок действий программы (program order). Между потоками её даёт запись true в volatile-поле и последующее чтение того же поля (synchronizes-with). Последний шаг — транзитивность: связанные стрелки образуют одну цепочку от записи 20 до чтения лимита обработчиком.",
+        illustration: { file: "jmm-ready.svg", alt: "Загрузчик записал maxConnections = 20 и ссылку config, затем ready = true. Обработчик прочитал true из того же volatile ready и после этого читает config.maxConnections." } },
+      { heading: "4. Почему volatile достаточно поставить на ready?", text: "Сигнал передаёт гарантию видимости всех записей загрузчика до ready = true, включая заполнение объекта. Это и есть безопасная публикация: другой поток получает подготовленное состояние через предусмотренную правилами языка связь. Для одноразовой передачи отдельный volatile у config уже не нужен. Изменение объекта после сигнала потребовало бы новой координации." },
+      { heading: "А если сделать счётчик volatile?", text: "Пусть два потока выполняют код ниже. Каждый может прочитать 0, прибавить единицу и записать 1. Видимость отдельных записей сохранена, но одно увеличение потеряно. Для неделимого увеличения подходит AtomicInteger.getAndIncrement(). Другой вариант — выполнять всю операцию под одним монитором: synchronized даёт и взаимное исключение, и видимость при последующем входе через тот же монитор.",
+        code: `private volatile int counter;
+
+void increment() {
+    counter++;
+}` },
+      { heading: "5. Как обновлять настройки без перезапуска?", text: "После первой загрузки ready уже равен true. Если теперь конфигурация регулярно меняется, удобнее публиковать каждую версию одной записью в volatile-ссылку. Загрузчик конструирует новый неизменяемый объект. Обработчик один раз читает ссылку и использует этот снимок на протяжении запроса.",
+        code: `record Config(String databaseUrl, int maxConnections) {}
+
+class ConfigProvider {
+    private volatile Config config;
+
+    void update(Config value) {
+        config = value;
+    }
+
+    Config current() {
+        return config;
+    }
+}
+
+// В обработчике запроса:
+Config snapshot = provider.current();
+if (snapshot == null) return; // Первая загрузка ещё не завершена
+connect(snapshot.databaseUrl(), snapshot.maxConnections());`,
+        illustration: { file: "jmm-config-snapshots.svg", alt: "Первый запрос взял V1, db-a и 20. После публикации V2 он продолжает использовать V1. Следующий запрос берёт V2, db-b и 40." } },
+      { heading: "Зачем сохранять ссылку в snapshot?", text: "Представь, что между двумя вызовами current() опубликована V2. Если отдельно взять адрес из первого вызова и лимит из второго, можно случайно соединить db-a и 40. Локальная переменная удерживает одну версию. В этом record компоненты String и int неизменяемы. Если добавить список адресов, стоит скопировать его при создании, например через List.copyOf(). Если сами элементы изменяемы, потребуется защитить и их." },
+    ],
+    question: "Если запись произошла раньше по часам, обязан ли другой поток увидеть новое значение?",
+    answer: "Одних часов недостаточно. Найди связь в коде, например запись и последующее чтение одного volatile-поля. Без неё обычное общее поле в нашем примере может сохранить для читателя прежнее значение.",
+    extraQuestions: [
+      { question: "Гарантирует ли volatile атомарное counter++?", answer: "Нет. Два потока могут прочитать одно значение до того, как любой из них запишет результат. Для атомарного увеличения подойдёт AtomicInteger." },
+      { question: "Что даёт synchronized с точки зрения видимости?", answer: "Освобождение монитора happens-before последующего захвата того же монитора. Это связывает записи до выхода с чтениями после входа другого потока." },
+      { question: "Можно ли безопасно опубликовать объект одной volatile-ссылкой?", answer: "Да. Сначала полностью подготовь объект, затем присвой ссылку volatile-полю. Читатель должен получить эту ссылку через то же поле. Последующие изменения внутри объекта требуют отдельного решения." },
+      { question: "Что означает транзитивность happens-before?", answer: "Если A happens-before B и B happens-before C, то A happens-before C. В примере это позволяет связать обычную запись поля объекта с его чтением через промежуточную пару операций над ready." },
+    ],
+    englishQuestion: "What is happens-before in Java?",
+    englishAnswer: "Happens-before is a relationship in the Java Memory Model that gives ordering and visibility guarantees. Suppose a loader fills a config object and then writes true to a volatile ready flag. A handler that reads true from that flag can see the earlier configuration writes. Program order and the volatile access form a chain across the two threads. For repeated updates, I publish immutable snapshots through a volatile reference. Volatile alone does not make a compound operation such as counter++ atomic.",
+    source: jls + "#jls-17.4.5",
     ticket: "jmm-publication",
   },
   {

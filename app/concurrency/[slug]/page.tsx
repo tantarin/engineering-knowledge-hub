@@ -99,7 +99,7 @@ export default async function Article({ params }: Props) {
               <summary>{q.question}</summary><p>{q.answer}</p>
             </details>)}
           </section>
-          {a.englishAnswer && <InterviewAnswer answer={a.englishAnswer} />}
+          {a.englishAnswer && <InterviewAnswer question={a.englishQuestion} answer={a.englishAnswer} />}
           <p>
             <a href={a.source} rel="noreferrer" target="_blank">
               Первоисточник ·{" "}

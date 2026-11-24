@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 230" role="img" aria-labelledby="title"><title id="title">Путь от записи лимита до чтения в другом потоке</title>
+<rect width="680" height="230" rx="14" fill="#f5f7fb"/><g font-family="system-ui,sans-serif" fill="#192943">
+<text x="18" y="32" font-size="21" font-weight="650">Как значение 20 доходит до обработчика</text>
+<g fill="#d8e9fb"><rect x="18" y="53" width="390" height="59" rx="8"/><rect x="455" y="53" width="206" height="59" rx="8"/></g>
+<g fill="#d6eee3"><rect x="455" y="154" width="206" height="59" rx="8"/><rect x="18" y="154" width="390" height="59" rx="8"/></g>
+<g font-size="17"><text x="31" y="78">Загрузчик записал лимит 20</text><text x="31" y="100">и сохранил ссылку в config</text><text x="470" y="89">Записал ready = true</text><text x="470" y="190">Прочитал ready: true</text><text x="31" y="180">Обработчик читает config</text><text x="31" y="202">и видит maxConnections = 20</text></g>
+<path d="M411 82h38m-8 -6 8 6-8 6 M558 114v36m-6 -8 6 8 6 -8 M451 184h-38m8 -6 -8 6 8 6" fill="none" stroke="#344b69" stroke-width="3"/><text x="338" y="139" font-size="16">то же volatile-поле</text></g></svg>
