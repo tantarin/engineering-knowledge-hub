@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 355" role="img" aria-labelledby="title"><title id="title">Заказ 101 · карта одна, резерва два</title><rect width="680" height="355" rx="14" fill="#f5f7fb"/><g font-family="system-ui,sans-serif" fill="#192943"><text x="17" y="32" font-size="21" font-weight="650">Заказ 101 · карта одна, резерва два</text>
+<text x="22" y="68" font-size="16" font-weight="650">Поток A</text>
+<text x="254" y="68" font-size="16" font-weight="650">Поток B</text>
+<text x="493" y="68" font-size="16" font-weight="650">На складе</text>
+<rect x="12" y="82" width="655" height="40" rx="6" fill="#dce9fa"/>
+<text x="22" y="108" font-size="16">containsKey → false</text>
+<text x="254" y="108" font-size="16">—</text>
+<text x="493" y="108" font-size="16">0 резервов</text>
+<rect x="12" y="133" width="655" height="40" rx="6" fill="#fae6c7"/>
+<text x="22" y="159" font-size="16">—</text>
+<text x="254" y="159" font-size="16">containsKey → false</text>
+<text x="493" y="159" font-size="16">0 резервов</text>
+<rect x="12" y="184" width="655" height="40" rx="6" fill="#d6eee4"/>
+<text x="22" y="210" font-size="16">reserve(101)</text>
+<text x="254" y="210" font-size="16">—</text>
+<text x="493" y="210" font-size="16">1 резерв</text>
+<rect x="12" y="235" width="655" height="40" rx="6" fill="#dce9fa"/>
+<text x="22" y="261" font-size="16">—</text>
+<text x="254" y="261" font-size="16">reserve(101)</text>
+<text x="493" y="261" font-size="16">2 резерва</text>
+<rect x="12" y="286" width="655" height="40" rx="6" fill="#fae6c7"/>
+<text x="22" y="312" font-size="16">put(101, true)</text>
+<text x="254" y="312" font-size="16">put(101, true)</text>
+<text x="493" y="312" font-size="16">2 резерва</text>
+</g></svg>

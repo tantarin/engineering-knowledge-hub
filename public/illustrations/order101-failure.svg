@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 202" role="img" aria-labelledby="title"><title id="title">Два возможных места сбоя</title><rect width="680" height="202" rx="14" fill="#f5f7fb"/><g font-family="system-ui,sans-serif" fill="#192943"><text x="17" y="32" font-size="21" font-weight="650">Два возможных места сбоя</text>
+<text x="22" y="68" font-size="16" font-weight="650">Момент сбоя</text>
+<text x="254" y="68" font-size="16" font-weight="650">Что знает обработчик</text>
+<text x="493" y="68" font-size="16" font-weight="650">На складе</text>
+<rect x="12" y="82" width="655" height="40" rx="6" fill="#dce9fa"/>
+<text x="22" y="108" font-size="16">До вызова reserve</text>
+<text x="254" y="108" font-size="16">ключ занят</text>
+<text x="493" y="108" font-size="16">0 резервов</text>
+<rect x="12" y="133" width="655" height="40" rx="6" fill="#fae6c7"/>
+<text x="22" y="159" font-size="16">Ответ склада потерян</text>
+<text x="254" y="159" font-size="16">ключ занят, тайм-аут</text>
+<text x="493" y="159" font-size="16">1, если выполнено</text>
+</g></svg>
