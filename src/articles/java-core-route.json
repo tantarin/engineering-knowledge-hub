@@ -1,0 +1,186 @@
+{
+  "sections": [
+    {
+      "id": "core-language",
+      "title": "Java Language & OOP",
+      "lessons": [
+        "pass-by-value",
+        "identity-vs-equality",
+        "hashmap-equals-hashcode",
+        "immutable-shared-state",
+        "composition-inheritance",
+        "abstract-class-interface",
+        "overload-override",
+        "java-member-scope",
+        "string-pool",
+        "record-or-class"
+      ]
+    },
+    {
+      "id": "core-collections",
+      "title": "Collections & Generics",
+      "lessons": [
+        "hashmap-internals",
+        "mutable-map-key",
+        "arraylist-linkedlist",
+        "map-ordering",
+        "hashset-uniqueness",
+        "comparable-comparator",
+        "fail-fast-iterator",
+        "generics-erasure",
+        "generics-pecs",
+        "generics-factory",
+        "race-conditions",
+        "copy-on-write-list"
+      ]
+    },
+    {
+      "id": "core-exceptions",
+      "title": "Exceptions & Resources",
+      "lessons": [
+        "checked-unchecked",
+        "finally-exception",
+        "try-with-resources",
+        "import-thread-interrupt",
+        "stack-overflow-vs-oom"
+      ]
+    },
+    {
+      "id": "core-streams",
+      "title": "Streams & Functional Java",
+      "lessons": [
+        "functional-interface",
+        "lambda-or-anonymous",
+        "stream-pipeline",
+        "stream-flatmap",
+        "stream-single-use",
+        "optional-fallback",
+        "java-parallel-stream"
+      ]
+    },
+    {
+      "id": "core-jvm",
+      "title": "JVM & Memory",
+      "lessons": [
+        "jdk-jre-jvm",
+        "stack-heap",
+        "gc-algorithms",
+        "java21-gc-choice",
+        "gc-stop-the-world",
+        "heap-retention",
+        "class-loading",
+        "jit-warmup",
+        "native-memory",
+        "oom-investigation"
+      ]
+    },
+    {
+      "id": "core-concurrency",
+      "title": "Concurrency",
+      "lessons": [
+        "runnable-callable-future",
+        "thread-pools",
+        "executor-rejection",
+        "atomic-operations",
+        "read-write-locks",
+        "coordination-primitives",
+        "producer-consumer",
+        "threadlocal-context",
+        "threadlocal-pool-leak",
+        "classify-concurrency-failures",
+        "executor-shutdown",
+        "structured-concurrency-21"
+      ]
+    },
+    {
+      "id": "core-modern",
+      "title": "Modern Java 17–21",
+      "lessons": [
+        "record-compact-constructor",
+        "sealed-hierarchy",
+        "instanceof-pattern",
+        "switch-pattern",
+        "text-blocks",
+        "java21-virtual-threads"
+      ]
+    }
+  ],
+  "priority": [
+    "hashmap-internals",
+    "hashmap-equals-hashcode",
+    "stack-heap",
+    "gc-algorithms",
+    "generics-pecs",
+    "thread-pools",
+    "runnable-callable-future",
+    "atomic-operations",
+    "threadlocal-pool-leak",
+    "stream-pipeline",
+    "class-loading",
+    "jit-warmup"
+  ],
+  "titles": {
+    "pass-by-value": "Java передаёт объекты по ссылке или по значению?",
+    "identity-vs-equality": "Почему == иногда «работает» для строк?",
+    "hashmap-equals-hashcode": "Контракт equals и hashCode",
+    "immutable-shared-state": "Неизменяемый объект и защитные копии",
+    "composition-inheritance": "Наследование или композиция для расчёта скидки?",
+    "abstract-class-interface": "Abstract class или interface для обработчиков?",
+    "overload-override": "Перегрузка и переопределение: какой метод вызовут?",
+    "java-member-scope": "final, static, this и super на одном заказе",
+    "string-pool": "String Pool: почему две строки иногда имеют одну ссылку?",
+    "record-or-class": "Когда для DTO подойдёт record?",
+    "hashmap-internals": "HashMap изнутри: бакеты, resize и treeification",
+    "mutable-map-key": "Почему карта теряет изменённый ключ?",
+    "arraylist-linkedlist": "ArrayList и LinkedList: где на самом деле стоит вставка?",
+    "map-ordering": "HashMap, LinkedHashMap или TreeMap для отчёта?",
+    "hashset-uniqueness": "Как HashSet решает, что заказ уже встречался?",
+    "comparable-comparator": "Comparable или Comparator: куда поместить порядок?",
+    "fail-fast-iterator": "Почему remove в обходе может бросить ConcurrentModificationException?",
+    "generics-erasure": "Generics и type erasure: куда исчезает тип элемента?",
+    "generics-pecs": "Почему источник extends, а приёмник super?",
+    "generics-factory": "Почему нельзя написать new T()?",
+    "race-conditions": "ConcurrentHashMap и атомарная операция карты",
+    "copy-on-write-list": "CopyOnWriteArrayList: какую версию увидит слушатель?",
+    "checked-unchecked": "Checked и unchecked: что увидит вызывающий код?",
+    "finally-exception": "Что станет с исключением, если finally тоже бросает?",
+    "try-with-resources": "Try-with-resources: в каком порядке закрываются ресурсы?",
+    "import-thread-interrupt": "InterruptedException: что делать с сигналом отмены?",
+    "stack-overflow-vs-oom": "StackOverflowError или OutOfMemoryError: где искать причину?",
+    "functional-interface": "Что обещает функциональный интерфейс?",
+    "lambda-or-anonymous": "Лямбда и анонимный класс: на кого указывает this?",
+    "stream-pipeline": "Stream API: когда выполняются filter и map?",
+    "stream-flatmap": "map или flatMap: как получить товары из всех заказов?",
+    "stream-single-use": "Почему Stream нельзя читать второй раз?",
+    "optional-fallback": "Optional: почему запасной запрос выполняется даже при попадании в кэш?",
+    "java-parallel-stream": "Когда parallel stream замедляет запрос?",
+    "jdk-jre-jvm": "JDK, JRE и JVM: кто запускает сервис?",
+    "stack-heap": "Stack vs Heap: две ссылки на один заказ",
+    "gc-algorithms": "Как GC определяет, какие объекты можно освободить?",
+    "java21-gc-choice": "G1 или ZGC: что ограничивает задержку?",
+    "gc-stop-the-world": "Stop-the-world: почему p99 вырос при свободном ядре?",
+    "heap-retention": "Утечка памяти в Java: кто удерживает старые ответы?",
+    "class-loading": "ClassLoader: когда класс загружен и когда проинициализирован?",
+    "jit-warmup": "JIT: почему первые запросы сервиса медленнее?",
+    "native-memory": "Metaspace и direct memory: почему RSS больше heap?",
+    "oom-investigation": "Как расследовать OutOfMemoryError?",
+    "runnable-callable-future": "Runnable, Callable и Future: кто выполняет и кто получает результат?",
+    "thread-pools": "ExecutorService и ThreadPoolExecutor: куда попадает задача?",
+    "executor-rejection": "Переполнение очереди: что получит отправитель?",
+    "atomic-operations": "AtomicInteger и CAS: один оставшийся билет",
+    "read-write-locks": "ReentrantReadWriteLock и StampedLock: как проверить снимок?",
+    "coordination-primitives": "Semaphore, CountDownLatch или CyclicBarrier?",
+    "producer-consumer": "BlockingQueue: граница между приёмом и обработкой",
+    "threadlocal-context": "ThreadLocal: кому принадлежит request id?",
+    "threadlocal-pool-leak": "Почему следующий запрос увидел пользователя предыдущего?",
+    "classify-concurrency-failures": "Deadlock, livelock и starvation: какой прогресс пропал?",
+    "executor-shutdown": "Как остановить ExecutorService и дождаться задач?",
+    "structured-concurrency-21": "Structured Concurrency в Java 21: Preview API",
+    "record-compact-constructor": "Compact constructor: где проверить вход record?",
+    "sealed-hierarchy": "Sealed classes: какие исходы оплаты возможны?",
+    "instanceof-pattern": "Pattern matching for instanceof: где видна переменная?",
+    "switch-pattern": "Pattern matching for switch в Java 21",
+    "text-blocks": "Text blocks: почему в строке появился последний перевод строки?",
+    "java21-virtual-threads": "Виртуальный поток на запрос в Java 21"
+  }
+}

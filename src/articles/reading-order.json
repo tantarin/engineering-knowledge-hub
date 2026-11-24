@@ -1,11 +1,108 @@
 [
   {
-    "id": "java-core",
-    "title": "Java Core: объекты и коллекции",
-    "goal": "Разберите, как равенство объектов влияет на поведение коллекций Java.",
+    "id": "core-language",
+    "title": "Java Language & OOP",
     "track": "technical",
+    "goal": "Разберите вызов метода и идентичность объектов на малых примерах.",
     "lessons": [
-      "hashmap-equals-hashcode"
+      "pass-by-value",
+      "identity-vs-equality",
+      "hashmap-equals-hashcode",
+      "composition-inheritance",
+      "abstract-class-interface",
+      "overload-override",
+      "java-member-scope",
+      "string-pool",
+      "record-or-class"
+    ]
+  },
+  {
+    "id": "core-collections",
+    "title": "Collections & Generics",
+    "track": "technical",
+    "goal": "Подберите коллекцию и тип параметра под контракт вызывающего кода.",
+    "lessons": [
+      "hashmap-internals",
+      "mutable-map-key",
+      "arraylist-linkedlist",
+      "map-ordering",
+      "hashset-uniqueness",
+      "comparable-comparator",
+      "fail-fast-iterator",
+      "generics-erasure",
+      "generics-pecs",
+      "generics-factory",
+      "copy-on-write-list"
+    ]
+  },
+  {
+    "id": "core-exceptions",
+    "title": "Exceptions & Resources",
+    "track": "technical",
+    "goal": "Сохраните причину ошибки и корректно освободите ресурс.",
+    "lessons": [
+      "checked-unchecked",
+      "finally-exception",
+      "try-with-resources",
+      "stack-overflow-vs-oom"
+    ]
+  },
+  {
+    "id": "core-streams",
+    "title": "Streams & Functional Java",
+    "track": "technical",
+    "goal": "Проследите значения от источника до терминальной операции.",
+    "lessons": [
+      "functional-interface",
+      "lambda-or-anonymous",
+      "stream-pipeline",
+      "stream-flatmap",
+      "stream-single-use",
+      "optional-fallback"
+    ]
+  },
+  {
+    "id": "core-jvm",
+    "title": "JVM & Memory",
+    "track": "technical",
+    "goal": "Свяжите поведение JVM с данными профилирования.",
+    "lessons": [
+      "jdk-jre-jvm",
+      "stack-heap",
+      "gc-stop-the-world",
+      "heap-retention",
+      "class-loading",
+      "jit-warmup",
+      "native-memory",
+      "oom-investigation"
+    ]
+  },
+  {
+    "id": "core-concurrency",
+    "title": "Concurrency",
+    "track": "technical",
+    "goal": "Определите границы задачи, отмены и владения ресурсом.",
+    "lessons": [
+      "runnable-callable-future",
+      "executor-rejection",
+      "coordination-primitives",
+      "threadlocal-context",
+      "threadlocal-pool-leak",
+      "executor-shutdown",
+      "structured-concurrency-21"
+    ]
+  },
+  {
+    "id": "core-modern",
+    "title": "Modern Java 17–21",
+    "track": "technical",
+    "goal": "Используйте возможности Java 17–21 на конкретных моделях данных.",
+    "lessons": [
+      "record-compact-constructor",
+      "sealed-hierarchy",
+      "instanceof-pattern",
+      "switch-pattern",
+      "text-blocks"
     ]
   },
   {

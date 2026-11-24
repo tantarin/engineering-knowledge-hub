@@ -9,7 +9,9 @@ import microservices from "./career-microservices.json" with { type: "json" };
 import springAndHelm from "./career-frameworks.json" with { type: "json" };
 import messagingAndStorage from "./career-messaging.json" with { type: "json" };
 import streams from "./career-streams.json" with { type: "json" };
-export const articles = [
+import coreLessons from "./java-core-lessons.json" with { type: "json" };
+import coreSupplements from "./java-core-supplements.json" with { type: "json" };
+const existing = [
   ...guide,
   ...java,
   ...data,
@@ -21,4 +23,19 @@ export const articles = [
   ...springAndHelm,
   ...messagingAndStorage,
   ...streams,
+];
+
+const supplements = new Map(coreSupplements.map(lesson => [lesson.slug, lesson]));
+export const articles = [
+  ...existing.map(article => {
+    const lesson = supplements.get(article.slug);
+    if (!lesson) return article;
+    return {
+      ...article,
+      body: article.body + "\n\n## Практикум Java Core\n\n" + lesson.body,
+      exercise: lesson.exercise,
+      interview: article.interview ?? lesson.interview,
+    };
+  }),
+  ...coreLessons,
 ];

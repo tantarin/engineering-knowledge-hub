@@ -72,3 +72,19 @@ test("All five Revolut stages have separate preparation routes and a rehearsal",
       assert.ok(pages.has(lesson.slug) && lesson.task);
   }
 });
+
+test("Java Core links all 62 distinct topics to lessons with a runnable example and an exercise", () => {
+  const route = JSON.parse(readFileSync(new URL("../src/articles/java-core-route.json", import.meta.url)));
+  const slugs = route.sections.flatMap(section => section.lessons);
+  assert.deepEqual(route.sections.map(section => section.lessons.length), [10, 12, 5, 7, 10, 12, 6]);
+  assert.equal(new Set(slugs).size, 62);
+  assert.equal(route.priority.length, 12);
+  assert.equal(new Set(route.priority).size, 12);
+  for (const slug of route.priority) assert.ok(slugs.includes(slug));
+  for (const slug of slugs) {
+    const lesson = articles.find(article => article.slug === slug);
+    assert.ok(route.titles[slug] && lesson?.interview?.answer, slug);
+    assert.match(lesson.body, /class Demo/);
+    assert.ok(lesson.exercise?.prompt && lesson.exercise.code && lesson.exercise.solution, slug);
+  }
+});

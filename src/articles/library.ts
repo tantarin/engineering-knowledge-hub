@@ -7,6 +7,7 @@ export interface PublicArticle {
   group: string;
   summary: string;
   body: string;
+  exercise?: { code: string; prompt: string; solution: string };
   ticket?: string;
   quiz?: { prompt: string; options: string[]; correct: number; reason: string }[];
   sqlExercise?: { hint: string; solution: string; explanation: string };

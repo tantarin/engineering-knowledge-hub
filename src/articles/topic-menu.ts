@@ -1,3 +1,4 @@
+import core from "./java-core-route.json";
 import { chapters, entries } from "./library";
 import { articles } from "./concurrency";
 
@@ -13,7 +14,13 @@ function chapter(id: string): Section {
 const storage = chapter("queries-storage");
 const isNoSQL = (lesson: Lesson) => ["/articles/mongo-shard-key/", "/articles/redis-cache-aside/"].includes(lesson.href);
 export const menuTopics: MenuTopic[] = [
-  { title: "Java Core", sections: [chapter("java-core")] },
+  { title: "Java Core", sections: [
+    { title: "Маршрут", lessons: [{ title: "Карта Java Core и первые 12 тем", href: "/java-core/" }] },
+    ...core.sections.map(section => ({
+      title: section.title,
+      lessons: section.lessons.map(slug => ({ title: (core.titles as Record<string, string>)[slug], href: `/articles/${slug}/` })),
+    })),
+  ] },
   { title: "Java · многопоточность", sections: [
     chapter("java-basics"), chapter("synchronization"), chapter("executors"),
     { title: "Практикум Java", lessons: articles.map(a => ({ title: a.title, href: `/concurrency/${a.slug}/` })) },

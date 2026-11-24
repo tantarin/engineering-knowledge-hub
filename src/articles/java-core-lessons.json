@@ -1,0 +1,884 @@
+[
+  {
+    "slug": "pass-by-value",
+    "title": "Java передаёт объекты по ссылке или по значению?",
+    "summary": "Метод добавил товар в корзину, затем создал новую пустую корзину. Что увидит вызывающий код?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Cart {\n      void reset(List<String> items) {\n        items.add(\"чай\");\n        items = new ArrayList<>();\n      }\n    }\n    var cart = new ArrayList<String>();\n    new Cart().reset(cart);\n    System.out.println(cart);\n  }\n}\n```\n\n[чай]. При вызове в параметр копируется значение ссылки. Оба имени сначала ведут к одному списку. Вторая строка метода переназначает только локальное имя.\n\n## Вопросы на собеседовании\n\n1. Как очистить корзину вызывающего кода?\n2. Что изменится для List.of()?\n3. Как сделать замену явной в API?\n\nИспользуйте clear() для изменяемого общего списка либо верните новый список и присвойте его у вызывающей стороны. У List.of() очистка не поддерживается.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "items = new ArrayList<>();",
+      "prompt": "Почему корзина клиента не опустела? Замените строку так, чтобы прежняя корзина стала пустой.",
+      "solution": "items.clear() изменит существующий список. Если корзина неизменяемая, верните новую коллекцию и присвойте её у владельца."
+    },
+    "interview": {
+      "question": "How does Java pass a reference to a method?",
+      "answer": "Java passes every argument by value. For an object the copied value is a reference, so both variables can reach the same mutable state. Reassigning the parameter changes only the local reference. If the caller should adopt a replacement, I return it explicitly."
+    },
+    "num": 140,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "identity-vs-equality",
+    "title": "Почему == иногда «работает» для строк?",
+    "summary": "Статус из HTTP совпадает по буквам с литералом PAID. Проверка через == неожиданно отклоняет заказ.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    String expected = \"PAID\";\n    String input = new String(expected);\n    System.out.println(input == expected);\n    System.out.println(expected.equals(input));\n  }\n}\n```\n\nfalse, затем true. Для ссылок == сравнивает идентичность объектов. String.equals сравнивает содержимое. Для примитивов == сравнивает значения.\n\n## Вопросы на собеседовании\n\n1. Почему тест с двумя литералами проходит?\n2. Как обработать null?\n3. Когда сравнение по идентичности уместно?\n\nЛитералы интернируются. Для nullable-полей подойдёт Objects.equals(a, b). Для enum один экземпляр на константу, там == выражает нужную семантику.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "if (status == \"PAID\") ship();",
+      "prompt": "Тест передаёт литерал, обработчик получает строку из JSON. Исправьте проверку с учётом null.",
+      "solution": "Используйте \"PAID\".equals(status). Литерал заведомо ненулевой, а вход может быть null."
+    },
+    "interview": {
+      "question": "When would you use equals instead of ==?",
+      "answer": "I use reference identity when I need the very same instance. For domain values I use their equality contract. String literals can share an instance, which can hide an identity comparison bug in tests. I test with independently constructed equal values."
+    },
+    "num": 141,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "composition-inheritance",
+    "title": "Наследование или композиция для расчёта скидки?",
+    "summary": "У двух магазинов разная скидка. Расчёт доставки у них общий. Нужно менять правило цены независимо от доставки.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    record Checkout(java.util.function.IntUnaryOperator discount) {\n      int total(int subtotal) {\n        return discount.applyAsInt(subtotal) + 50;\n      }\n    }\n    System.out.println(new Checkout(n -> n - 10).total(100));\n    System.out.println(new Checkout(n -> n).total(100));\n  }\n}\n```\n\n140 и 150. Объект Checkout делегирует изменчивую часть переданной функции. Наследование оправдано, когда подкласс действительно сохраняет контракт основного типа во всех местах использования.\n\n## Вопросы на собеседовании\n\n1. Как протестировать доставку отдельно?\n2. Что если завтра скидка зависит от клиента?\n3. Когда подкласс нарушит контракт?\n\nПередайте тождественную функцию для теста доставки. Для контекста клиента введите интерфейс с явными параметрами. Подкласс, запрещающий допустимый для базового класса ввод, нельзя прозрачно подставить вместо него.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "int total(int subtotal) { return subtotal + 50; }",
+      "prompt": "Правило скидки хранится в Checkout, но изменение правила не отражается в цене. Исправьте формулу.",
+      "solution": "Сначала примените переданную стратегию: return discount.applyAsInt(subtotal) + 50."
+    },
+    "interview": {
+      "question": "When would you choose composition over inheritance?",
+      "answer": "Composition makes a dependency explicit and lets me vary one behavior at a time. Inheritance also creates a substitution contract: callers of the base type must remain correct for every subtype. I choose based on that contract, not on how many lines the implementations share."
+    },
+    "num": 142,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "abstract-class-interface",
+    "title": "Abstract class или interface для обработчиков?",
+    "summary": "Импорту и экспорту нужен общий контракт запуска, но только части задач нужен счётчик попыток.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    interface Job {\n      void run();\n    }\n    abstract class Counted implements Job {\n      int attempts;\n\n      public final void run() {\n        attempts++;\n        execute();\n      }\n\n      abstract void execute();\n    }\n    var job =\n        new Counted() {\n          void execute() {\n            System.out.println(attempts);\n          }\n        };\n    job.run();\n  }\n}\n```\n\n1. Интерфейс задаёт роль и может содержать default-методы. Абстрактный класс хранит состояние экземпляра и задаёт шаблон выполнения. У класса один непосредственный суперкласс, интерфейсов может быть несколько.\n\n## Вопросы на собеседовании\n\n1. Где поместить счётчик экземпляра?\n2. Что делать, если уже есть другой суперкласс?\n3. Зачем final у run?\n\nСостояние хранится в классе или делегате. При занятом месте суперкласса используйте композицию. final защищает порядок увеличения и вызова execute.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "void run() { execute(); attempts++; }",
+      "prompt": "В счётчике должны быть и неуспешные попытки. Что изменить, если execute может бросить исключение?",
+      "solution": "Увеличьте attempts до вызова execute(), если попыткой считается даже неудачный запуск."
+    },
+    "interview": {
+      "question": "When is an abstract class a better fit than an interface?",
+      "answer": "I use an interface for a role that unrelated classes can implement. An abstract class is useful for common instance state or a template method. If inheriting that base would prevent another valid design, I extract a collaborator and keep the interface small."
+    },
+    "num": 143,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "overload-override",
+    "title": "Перегрузка и переопределение: какой метод вызовут?",
+    "summary": "Переменная имеет тип Object и содержит строку. Дочерний логгер объявил несколько методов записи.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Base {\n      String write(Object x) {\n        return \"base object\";\n      }\n\n      String write(String x) {\n        return \"base string\";\n      }\n    }\n    class Child extends Base {\n      @Override\n      String write(Object x) {\n        return \"child object\";\n      }\n    }\n    Base log = new Child();\n    Object value = \"order\";\n    System.out.println(log.write(value));\n  }\n}\n```\n\nchild object. Компилятор выбирает сигнатуру write(Object) по статическим типам. Во время выполнения виртуальный вызов находит реализацию этой сигнатуры в Child.\n\n## Вопросы на собеседовании\n\n1. Что даст log.write(\"order\")?\n2. Зачем @Override?\n3. Работает ли динамическая диспетчеризация для static?\n\nЛитерал выбирает write(String), который унаследован от Base. Аннотация выявляет ошибку в сигнатуре. Статические методы скрываются и выбираются по типу на этапе компиляции.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "Object value = \"order\"; log.write(value);",
+      "prompt": "Предскажите сигнатуру. Как изменится ответ, если объявить переменную как String?",
+      "solution": "Для Object выбрана сигнатура write(Object), её переопределяет Child. Для String выбирается write(String), унаследованная от Base."
+    },
+    "interview": {
+      "question": "How does Java select an overload and an override?",
+      "answer": "Overload resolution uses the declared argument and receiver types at compile time. Dynamic dispatch then selects the implementation of the chosen instance method on the actual receiver. Changing an argument variable from String to Object can therefore change the overload."
+    },
+    "num": 144,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "java-member-scope",
+    "title": "final, static, this и super на одном заказе",
+    "summary": "Две копии заказа должны иметь разные номера, но общий счётчик созданных объектов.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Base {\n      final int id;\n\n      Base(int id) {\n        this.id = id;\n      }\n    }\n    class Order extends Base {\n      static int created;\n\n      Order(int id) {\n        super(id);\n        created++;\n      }\n    }\n    var first = new Order(7);\n    var second = new Order(8);\n    System.out.println(first.id + \" \" + second.id + \" \" + Order.created);\n  }\n}\n```\n\n7 8 2. this указывает на текущий экземпляр, super(id) вызывает конструктор базовой части. final фиксирует значение поля. static-поле принадлежит загруженному классу.\n\n## Вопросы на собеседовании\n\n1. Что случится при повторной записи id?\n2. Есть ли this в static-методе?\n3. Безопасно ли created++ в двух потоках?\n\nКомпилятор запретит второе присваивание final-поля. У статического метода нет получателя this. Общий счётчик потребует синхронизации.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "static int id;",
+      "prompt": "У двух заказов после создания второго оказался одинаковый номер. Исправьте область хранения.",
+      "solution": "Сделайте id полем экземпляра final int id и присваивайте в конструкторе. Оставьте static только для общего счётчика."
+    },
+    "interview": {
+      "question": "Which state is shared by instances of a class?",
+      "answer": "Instance fields belong to each object. Static state belongs to the loaded class and is shared by its instances. A final field can be assigned during construction but cannot be reassigned afterwards. These rules do not make an increment atomic."
+    },
+    "num": 145,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "string-pool",
+    "title": "String Pool: почему две строки иногда имеют одну ссылку?",
+    "summary": "Тест собирает код страны из констант, а рабочее приложение получает его из массива символов.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    String literal = \"DE\";\n    String folded = \"D\" + \"E\";\n    String parsed = new String(new char[] {'D', 'E'});\n    System.out.println(literal == folded);\n    System.out.println(literal == parsed);\n    System.out.println(literal == parsed.intern());\n  }\n}\n```\n\ntrue, false, true. Константное выражение вычисляется компилятором. intern возвращает канонического представителя равного содержимого. Сам parsed после вызова остаётся тем же объектом.\n\n## Вопросы на собеседовании\n\n1. Нужно ли intern перед каждым equals?\n2. Меняет ли intern исходную строку?\n3. Когда интернирование стоит измерять?\n\nДля сравнения текста хватает equals. Интернирование имеет смысл оценивать при большом количестве повторяющихся значений, с учётом памяти и стоимости поиска.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "parsed.intern(); boolean same = parsed == literal;",
+      "prompt": "Почему вызов intern ничего не изменил для parsed? Как лучше сравнить содержимое?",
+      "solution": "intern возвращает отдельный результат вызова. Для проверки содержания используйте parsed.equals(literal)."
+    },
+    "interview": {
+      "question": "How does string interning affect reference equality?",
+      "answer": "String literals and constant string expressions are interned. A string built from input can have the same characters and a different identity. Intern returns a canonical reference, but normal string equality already compares contents."
+    },
+    "num": 146,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "record-or-class",
+    "title": "Когда для DTO подойдёт record?",
+    "summary": "Сравнение двух ответов API должно учитывать валюту и сумму. В обычном классе забыли обновить equals после добавления валюты.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    record Price(String currency, int cents) {}\n    var a = new Price(\"EUR\", 100);\n    System.out.println(a.equals(new Price(\"EUR\", 100)));\n    System.out.println(a.equals(new Price(\"USD\", 100)));\n  }\n}\n```\n\ntrue, false. У record компоненты определяют конструктор, аксессоры, equals, hashCode и toString по умолчанию. Это прозрачное представление значения. Обычный класс удобнее, когда представление должно меняться независимо от публичного API.\n\n## Вопросы на собеседовании\n\n1. Почему нельзя наследоваться от Price?\n2. Можно ли менять содержимое компонента List?\n3. Подойдёт ли record для сущности с равенством только по id?\n\nRecord неявно final. Изменяемый компонент требует защитной копии. Если состояние и идентичность расходятся, продумайте отдельный тип ключа и контракт сущности.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "record User(long id, String displayName) {}",
+      "prompt": "Пользователя ищут по id, а ключ создают с обновлённым именем. Предложите отдельный ключ.",
+      "solution": "Используйте long id или record UserKey(long id). displayName храните в значении карты."
+    },
+    "interview": {
+      "question": "When would you model a value as a record?",
+      "answer": "I choose a record when the declared components describe the value I want clients to see. Generated equality follows those components. It is shallowly immutable, so mutable inputs still need defensive copying. A regular class gives more freedom to hide representation."
+    },
+    "num": 147,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "hashmap-internals",
+    "title": "HashMap изнутри: бакеты, resize и treeification",
+    "summary": "Кэш возвращает верные данные, но после подключения нового типа ключей get стал медленным. Посмотрите, где карта ищет запись при плохом hashCode.",
+    "body": "## Как карта находит заказ по ключу?\n\nПредставьте таблицу с 16 ячейками. Каждая ячейка — бакет, в котором могут оказаться несколько записей. Для простого примера возьмём ключи с хешами 1 и 17. Оба попадают в бакет 1, потому что у них совпадают четыре младших бита.\n\n| Действие | Что происходит в бакете 1 |\n| --- | --- |\n| Положили заказ с ключом 1 | Появилась первая запись |\n| Положили заказ с ключом 17 | Карта добавила вторую запись. Ключи различаются |\n| Запросили заказ по новому равному ключу 17 | Карта проверила сохранённый хеш и равенство ключа, затем вернула значение второй записи |\n\nПри расширении таблицы до 32 ячеек для выбора бакета используется ещё один бит. Теперь эти записи попадут в разные бакеты. А что изменится, если все ключи возвращают буквально одно и то же число?\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    record Key(int id) {\n      public int hashCode() {\n        return 1;\n      }\n    }\n    var cache = new HashMap<Key, Integer>(64);\n    for (int i = 0; i < 20; i++) cache.put(new Key(i), i);\n    System.out.println(cache.get(new Key(19)));\n  }\n}\n```\n\n19. В OpenJDK 21 хеш смешивается со старшими битами, индекс бакета вычисляется маской длины таблицы. При превышении порога заполнения таблица обычно удваивается; записи одного бакета разделяются по дополнительному биту. Одинаковые хеши так не разделятся. При добавлении в длинную цепочку реализация может перейти к дереву: TREEIFY_THRESHOLD равен 8, MIN_TREEIFY_CAPACITY — 64. В меньшей таблице сначала предпочтителен resize.\n\n## Вопросы на собеседовании\n\n1. Ускорит ли resize двадцать одинаковых хешей?\n2. Гарантирует ли дерево логарифмический поиск любых ключей?\n3. Что здесь определяет корректность?\n\nПри одинаковых хешах ключи останутся вместе. Для несравнимых ключей с совпадающими хешами поиск может обходить обе ветви. Распределяйте хеш по полям идентичности; совпадение ключа проверяется через equals.\n\n[OpenJDK 21 · реализация HashMap](https://github.com/openjdk/jdk21u/blob/master/src/java.base/share/classes/java/util/HashMap.java)",
+    "exercise": {
+      "code": "public int hashCode() { return 1; }",
+      "prompt": "Можно ли лечить медленный поиск только увеличением initialCapacity? Предложите хеш для Key(int id).",
+      "solution": "Нет: все записи имеют одинаковый хеш независимо от ёмкости таблицы. Для Key(int id) используйте Integer.hashCode(id) или сгенерированный хеш record."
+    },
+    "interview": {
+      "question": "How does HashMap find a key when hashes collide?",
+      "answer": "HashMap narrows a lookup to a bucket using a spread hash. Resize changes the bucket mask and redistributes entries. In OpenJDK a crowded bucket can become a tree once the table is large enough. These are implementation choices; stable equality and hashing are part of my key design."
+    },
+    "num": 148,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "mutable-map-key",
+    "title": "Почему карта теряет изменённый ключ?",
+    "summary": "Статус заказа сделали полем ключа. После смены статуса запись видна при обходе карты, но get не находит её.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Key {\n      int id = 1;\n\n      public int hashCode() {\n        return id;\n      }\n\n      public boolean equals(Object o) {\n        return o instanceof Key k && id == k.id;\n      }\n    }\n    var key = new Key();\n    var m = new HashMap<Key, String>();\n    m.put(key, \"paid\");\n    key.id = 2;\n    System.out.println(m.size() + \" \" + m.get(key));\n  }\n}\n```\n\nВ OpenJDK 21 этот пример печатает 1 null. Запись осталась по старому хешу. Контракт Map не определяет поведение для ключа, изменившего равенство во время хранения. Даже поиск по той же ссылке не исправляет выбор бакета.\n\n## Вопросы на собеседовании\n\n1. Достаточно ли final у ссылки key?\n2. Что изменить в модели?\n3. Когда безопасно поменять ключ?\n\nИспользуйте неизменяемый id как ключ и статус как значение. Если нужен другой ключ, удалите запись по исходному ключу до изменения и вставьте новую.\n\n[Collections и Generics · Dev.java](https://dev.java/learn/)",
+    "exercise": {
+      "code": "map.put(key, \"PAID\"); key.id++; map.remove(key);",
+      "prompt": "Объясните, почему удаление ненадёжно, и переставьте операции безопасно.",
+      "solution": "Удалите запись до изменения полей ключа. Надёжнее использовать неизменяемый ключ и при необходимости вставить другой."
+    },
+    "interview": {
+      "question": "What happens when you mutate a key after inserting it?",
+      "answer": "A hash table indexes an entry according to the key at insertion time. Mutating equality or hash fields while the key is stored violates the assumptions of lookup. I use an immutable identifier as the key and put evolving business state in the value."
+    },
+    "num": 149,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "arraylist-linkedlist",
+    "title": "ArrayList и LinkedList: где на самом деле стоит вставка?",
+    "summary": "В коде миграции заменили ArrayList на LinkedList, чтобы «быстрее вставлять в середину». Но позицию каждый раз ищут по номеру строки.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var rows = new LinkedList<>(List.of(\"A\", \"C\", \"D\"));\n    var cursor = rows.listIterator(1);\n    cursor.add(\"B\");\n    System.out.println(rows);\n  }\n}\n```\n\n[A, B, C, D]. Для связного списка вставить рядом с уже найденным узлом дёшево, но listIterator(index) сначала добирается до позиции. У ArrayList get по индексу O(1); вставка сдвигает хвост массива. Узлы LinkedList добавляют ссылки и обращения к разрозненным объектам.\n\n## Вопросы на собеседовании\n\n1. Какова стоимость get в цикле по LinkedList?\n2. Что меняет сохранённый итератор?\n3. Чем измерить выигрыш?\n\nИспользуйте последовательный обход итератором. Для повторных вставок в уже найденной позиции курсор убирает повторный поиск. Выбор проверяют на характерных размерах и операциях.\n\n[Collections и Generics · Dev.java](https://dev.java/learn/)",
+    "exercise": {
+      "code": "for (int i = 0; i < rows.size(); i++) consume(rows.get(i));",
+      "prompt": "rows — LinkedList. Почему полный обход может стать квадратичным? Перепишите цикл.",
+      "solution": "Замените на for (var row : rows) consume(row). Итератор проходит узлы по одному."
+    },
+    "interview": {
+      "question": "How do you choose between ArrayList and LinkedList?",
+      "answer": "An array list gives indexed access and stores references contiguously. A linked list can insert efficiently at a known iterator position, but finding that position can dominate. I look at traversal, allocation and locality as well as the insertion itself."
+    },
+    "num": 150,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "map-ordering",
+    "title": "HashMap, LinkedHashMap или TreeMap для отчёта?",
+    "summary": "Отчёт должен воспроизводить порядок поступления заказов. После изменения размера HashMap строки внезапно переставились.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var arrivals = new LinkedHashMap<Integer, String>();\n    arrivals.put(9, \"first\");\n    arrivals.put(2, \"second\");\n    System.out.println(arrivals.keySet());\n    System.out.println(new TreeMap<>(arrivals).keySet());\n  }\n}\n```\n\n[9, 2] и [2, 9]. У HashMap порядок обхода не входит в контракт. LinkedHashMap по умолчанию сохраняет порядок вставки. TreeMap поддерживает отсортированное дерево и диапазонные запросы; поиск и вставка занимают O(log n).\n\n## Вопросы на собеседовании\n\n1. Что выбрать для диапазона id?\n2. Когда пригодится accessOrder?\n3. Что произойдёт при compare(a,b)==0?\n\nTreeMap предлагает subMap. LinkedHashMap в режиме доступа помогает учитывать давность обращений. Нулевое сравнение в TreeMap задаёт один ключ.\n\n[Collections и Generics · Dev.java](https://dev.java/learn/)",
+    "exercise": {
+      "code": "return new HashMap<>(arrivals).keySet().toString();",
+      "prompt": "Отчёт обещает порядок поступления. Где пропала гарантия?",
+      "solution": "Создание HashMap теряет контракт порядка. Возвращайте представление или снимок исходного LinkedHashMap с сохранением порядка."
+    },
+    "interview": {
+      "question": "Which map would you use for predictable iteration order?",
+      "answer": "I choose the map by its observable contract. HashMap is suitable for lookup without an order requirement. LinkedHashMap preserves a defined iteration order. TreeMap supports sorted navigation and ranges, with equality for indexing determined by its comparison."
+    },
+    "num": 151,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "hashset-uniqueness",
+    "title": "Как HashSet решает, что заказ уже встречался?",
+    "summary": "Два сообщения содержат одинаковый номер заказа. Для отчёта нужно оставить только уникальные номера.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    record Id(int value) {}\n    var seen = new HashSet<Id>();\n    System.out.println(seen.add(new Id(7)));\n    System.out.println(seen.add(new Id(7)));\n  }\n}\n```\n\ntrue, затем false. В OpenJDK HashSet хранит элементы как ключи HashMap с одним служебным значением. Проверка уникальности наследует требования к равенству и стабильности хеша.\n\n## Вопросы на собеседовании\n\n1. Чем коллизия отличается от дубля?\n2. Можно ли менять поля элемента?\n3. Сделает ли HashSet дедупликацию долговечной?\n\nКоллизия требует сравнения ключей. Поля равенства должны оставаться стабильными. Для защиты от повторов после рестарта нужен устойчивый учёт операций.\n\n[Collections и Generics · Dev.java](https://dev.java/learn/)",
+    "exercise": {
+      "code": "seen.add(new StringBuilder(\"A\")); seen.add(new StringBuilder(\"A\"));",
+      "prompt": "Почему размер HashSet может быть 2? Подберите неизменяемый тип с равенством по содержимому.",
+      "solution": "StringBuilder наследует равенство по идентичности. Сохраняйте неизменяемые строки, например builder.toString()."
+    },
+    "interview": {
+      "question": "How does HashSet decide whether a value is already present?",
+      "answer": "A hash set uses key equality to enforce uniqueness. In OpenJDK its elements are keys in a backing hash map, so collisions do not imply duplicates. This solves an in-memory membership problem, not durable or distributed deduplication."
+    },
+    "num": 152,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "comparable-comparator",
+    "title": "Comparable или Comparator: куда поместить порядок?",
+    "summary": "Для витрины товары сортируются по цене, а для склада — по артикулу. При одинаковой цене витрина теряет один товар в TreeSet.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    record Product(int id, int price) {}\n    var order = Comparator.comparingInt(Product::price).thenComparingInt(Product::id);\n    var rows = new TreeSet<Product>(order);\n    rows.add(new Product(1, 100));\n    rows.add(new Product(2, 100));\n    System.out.println(rows.size());\n  }\n}\n```\n\n2. Уберите thenComparingInt — останется один элемент: TreeSet считает compare==0 эквивалентностью. Comparable задаёт естественный порядок типа, Comparator описывает внешний вариант. Сортировка списка с равными ключами сама дубликаты не убирает.\n\n## Вопросы на собеседовании\n\n1. Почему нельзя просто вычесть цены?\n2. Когда нужен второй критерий?\n3. Обязан ли список быть TreeSet для сортировки?\n\nВычитание int может переполниться. Используйте comparingInt или Integer.compare. Список можно сортировать с отдельным Comparator без потери элементов.\n\n[Collections и Generics · Dev.java](https://dev.java/learn/)",
+    "exercise": {
+      "code": "var s = new TreeSet<Product>(Comparator.comparingInt(Product::price));",
+      "prompt": "Сохраните два разных товара одинаковой цены.",
+      "solution": "Добавьте thenComparingInt(Product::id), если id уникален. Сравнение по цене и идентификатору отличит товары."
+    },
+    "interview": {
+      "question": "How can a comparator affect uniqueness in a sorted set?",
+      "answer": "Comparable defines a natural order; Comparator supplies an order for a particular use case. In a sorted set, comparison returning zero also determines membership. I add a stable tie-breaker when distinct business entities must both survive."
+    },
+    "num": 153,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "fail-fast-iterator",
+    "title": "Почему remove в обходе может бросить ConcurrentModificationException?",
+    "summary": "Очистка списка выполняется в одном потоке. Удаление через сам список во время обхода всё равно ломает итератор.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var ids = new ArrayList<>(List.of(1, 2, 3));\n    var it = ids.iterator();\n    it.next();\n    ids.add(4);\n    try {\n      it.next();\n    } catch (ConcurrentModificationException e) {\n      System.out.println(\"changed\");\n    }\n  }\n}\n```\n\nchanged. Итератор ArrayList сравнивает ожидаемую версию структурных изменений с текущей. Fail-fast помогает найти ошибку наилучшим усилием; отсутствие исключения ничего не доказывает о безопасности.\n\n## Вопросы на собеседовании\n\n1. Нужны ли два потока для ошибки?\n2. Как безопасно удалить текущий элемент?\n3. Что изменится у snapshot-итератора?\n\nВ одном потоке используйте Iterator.remove после next или removeIf. Итератор CopyOnWriteArrayList читает старый снимок и не поддерживает remove.\n\n[Collections и Generics · Dev.java](https://dev.java/learn/)",
+    "exercise": {
+      "code": "for (var id : ids) if (id < 0) ids.remove(id);",
+      "prompt": "Выберите способ удалить все отрицательные значения при однопоточном обходе.",
+      "solution": "Используйте ids.removeIf(id -> id < 0) либо it.remove() после it.next()."
+    },
+    "interview": {
+      "question": "When can an iterator detect a concurrent modification?",
+      "answer": "Fail-fast iterators can detect structural changes outside the iterator, even in one thread. Detection is best effort and cannot be used as a synchronization protocol. I use iterator removal, bulk operations or an appropriate concurrent collection depending on the contract."
+    },
+    "num": 154,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "generics-erasure",
+    "title": "Generics и type erasure: куда исчезает тип элемента?",
+    "summary": "Код принимает список заказов, но совместимость со старым API потребовала raw List. Ошибка оказалась в чтении, далеко от места записи.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    List<String> names = new ArrayList<>();\n    List raw = names;\n    raw.add(42);\n    try {\n      String name = names.get(0);\n    } catch (ClassCastException e) {\n      System.out.println(\"wrong element\");\n    }\n  }\n}\n```\n\nКомпилятор предупреждает о непроверенной записи. При стирании параметр обычно заменяется Object или своей левой границей. Для чтения String компилятор вставляет приведение типа; именно там видно нарушение. Метаданные деклараций могут сохранять generic-сигнатуры.\n\n## Вопросы на собеседовании\n\n1. Можно ли проверить instanceof List<String>?\n2. Почему List<?\n3. > допустим?\n4. Почему две перегрузки с List<Integer> и List<String> конфликтуют?\n\nКонкретный параметр списка не проверяется по runtime-классу объекта. List<?> проверяет только список. После стирания сигнатуры двух перегрузок совпадут.\n\n[Dev.java · Generics](https://dev.java/learn/generics/)",
+    "exercise": {
+      "code": "List raw = names; raw.add(42);",
+      "prompt": "Как сделать ошибку видимой при компиляции, а не в точке чтения?",
+      "solution": "Не переходите на raw List: сохраните List<String>. Добавление числа тогда отвергнет компилятор."
+    },
+    "interview": {
+      "question": "What information is erased from a generic type?",
+      "answer": "Java generics primarily enforce constraints at compile time. Erasure maps a type parameter to its bound and the compiler inserts casts where needed. Raw access can introduce heap pollution, so the observable failure may happen later at a typed read."
+    },
+    "num": 155,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "generics-pecs",
+    "title": "Почему источник extends, а приёмник super?",
+    "summary": "Нужно скопировать Integer из списка в List<Number>. Параметр List<Number> для источника не примет List<Integer>, хотя Integer является Number.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Copier {\n      static <T> void copy(List<? extends T> src, List<? super T> dst) {\n        for (T item : src) dst.add(item);\n      }\n    }\n    var result = new ArrayList<Number>();\n    Copier.copy(List.of(1, 2), result);\n    System.out.println(result);\n  }\n}\n```\n\n[1, 2]. Источник выдаёт значения некоторого подтипа T. Приёмник принимает T, хотя может быть коллекцией более общего типа. Из List<? super Integer> безопасно прочитать Object. Обычные List<Integer> и List<Number> инвариантны.\n\n## Вопросы на собеседовании\n\n1. Почему нельзя добавить Double в List<?\n2. extends Number>?\n3. Можно ли читать из super?\n4. Как скопировать в List<Object>?\n\nУ источника фактическим элементом может оказаться Integer. Для приёмника читаем Object. Тот же copy принимает List<Object> как назначение.\n\n[Dev.java · Generics](https://dev.java/learn/generics/)",
+    "exercise": {
+      "code": "void copy(List<Number> src, List<Number> dst)",
+      "prompt": "Метод должен принимать List<Integer> и писать в List<Object>. Измените обе границы.",
+      "solution": "Используйте <T> void copy(List<? extends T> src, List<? super T> dst). Выведите T из аргументов."
+    },
+    "interview": {
+      "question": "How do extends and super affect a collection API?",
+      "answer": "I type a producer with an upper bound and a consumer with a lower bound. That lets a copy operation read a subtype of T and write T into a container of a supertype. This is a statement about safe operations on an unknown type, not about collection mutability."
+    },
+    "num": 156,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "generics-factory",
+    "title": "Почему нельзя написать new T()?",
+    "summary": "Общий обработчик должен создавать пустой список результатов конкретного типа. У параметра T нет известного конструктора.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\nimport java.util.function.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Factory {\n      static <T> T create(java.util.function.Supplier<T> make) {\n        return make.get();\n      }\n    }\n    ArrayList<String> items = Factory.create(ArrayList::new);\n    items.add(\"ok\");\n    System.out.println(items);\n  }\n}\n```\n\n[ok]. Проверка типов не обещает, что у любого T есть доступный конструктор без аргументов. После стирания нет и обычного типа T для инструкции new. Фабрика передаёт способ создания явно.\n\n## Вопросы на собеседовании\n\n1. Что изменит T extends Base?\n2. Когда нужен Class<T>?\n3. Обязана ли фабрика каждый раз возвращать новый объект?\n\nГраница не требует конкретного конструктора. Class<T> подходит для работы с runtime-типом, а рефлексия потребует проверок и обработки ошибок. Контракт Supplier сам по себе не обещает свежий экземпляр.\n\n[Dev.java · Generics](https://dev.java/learn/generics/)",
+    "exercise": {
+      "code": "T value = new T();",
+      "prompt": "Покажите, как вызывающий код может передать ArrayList::new.",
+      "solution": "Пусть метод принимает Supplier<T> make и вызывает make.get(). Передайте ArrayList::new как фабрику."
+    },
+    "interview": {
+      "question": "How would you construct an instance of a generic type?",
+      "answer": "A type parameter does not carry a constructible runtime class or a constructor contract. I usually pass a Supplier or an explicit factory so callers choose construction and dependencies. A class token is useful when runtime type metadata is genuinely needed."
+    },
+    "num": 157,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "copy-on-write-list",
+    "title": "CopyOnWriteArrayList: какую версию увидит слушатель?",
+    "summary": "Обработчик проходит по подписчикам. В середине рассылки появился новый слушатель. Должен ли он получить текущее событие?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var listeners = new CopyOnWriteArrayList<>(List.of(\"A\"));\n    var current = listeners.iterator();\n    listeners.add(\"B\");\n    current.forEachRemaining(System.out::println);\n  }\n}\n```\n\nТекущий обход напечатает только A. Структурное изменение публикует новый массив, а итератор удерживает прежний. Стоимость копирования и временное удержание старых массивов растут с размером списка и частотой записи.\n\n## Вопросы на собеседовании\n\n1. Копируются ли сами слушатели?\n2. Видит ли новый итератор B?\n3. Подойдёт ли это для потока постоянных вставок?\n\nСнимок содержит ссылки на те же элементы. Новый обход увидит B. Для частой записи лучше сравнить цену блокировки или другой структуры.\n\n[Collections и Generics · Dev.java](https://dev.java/learn/)",
+    "exercise": {
+      "code": "var it = listeners.iterator(); listeners.add(\"B\");",
+      "prompt": "Предскажите содержимое it и нового итератора при исходном списке [A].",
+      "solution": "Старый итератор обойдёт только A. Созданный после add итератор обойдёт A и B."
+    },
+    "interview": {
+      "question": "When is a snapshot iterator worth the cost of copying?",
+      "answer": "Copy-on-write moves the cost to mutations. Iteration observes a stable array snapshot and can proceed while a new array is published. Objects inside the snapshot may still be mutable. I use it when reads greatly outnumber changes and the list is reasonably small."
+    },
+    "num": 158,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "checked-unchecked",
+    "title": "Checked и unchecked: что увидит вызывающий код?",
+    "summary": "Импорт читает файл по пути от пользователя. Чем ошибка чтения отличается для компилятора от неверного аргумента?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var path = java.nio.file.Path.of(\"Demo.java\");\n    try {\n      System.out.println(java.nio.file.Files.readString(path).length());\n    } catch (java.io.IOException e) {\n      System.out.println(\"read failed\");\n    }\n    try {\n      Integer.parseInt(\"x\");\n    } catch (NumberFormatException e) {\n      System.out.println(\"invalid number\");\n    }\n  }\n}\n```\n\nПреобразование строки бросает unchecked NumberFormatException. Для Files.readString контракт объявляет checked IOException: вызывающий метод обязан поймать его или объявить throws. Тип исключения сам по себе не определяет, безопасен ли повтор.\n\n## Вопросы на собеседовании\n\n1. Когда переводить IOException в доменную ошибку?\n2. Как сохранить причину?\n3. Нужно ли ловить весь Throwable?\n\nНа границе API добавьте контекст файла и сохраните cause. Обрабатывайте ошибки, для которых есть осмысленное решение; Error обычно не включают в обычный поток обработки.\n\n[JLS 21 · Exceptions](https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html)",
+    "exercise": {
+      "code": "String load(Path p) { return Files.readString(p); }",
+      "prompt": "Почему этот метод не скомпилируется? Сравните throws и перевод ошибки на границе сервиса.",
+      "solution": "Объявите throws IOException или поймайте её и переведите в осмысленную ошибку API с исходной причиной."
+    },
+    "interview": {
+      "question": "How do checked exceptions affect the caller of an API?",
+      "answer": "Checked exceptions are enforced by the compiler at the call site. Unchecked exceptions can still be part of an API contract. I choose the boundary where the caller can recover, and preserve the original cause when translating infrastructure failures."
+    },
+    "num": 159,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "finally-exception",
+    "title": "Что станет с исключением, если finally тоже бросает?",
+    "summary": "Сервис сообщил о неудачном закрытии файла. Ошибка обработки записи исчезла из лога.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    try {\n      try {\n        throw new IllegalStateException(\"parse\");\n      } finally {\n        throw new IllegalArgumentException(\"close\");\n      }\n    } catch (RuntimeException e) {\n      System.out.println(e.getMessage() + \" \" + e.getSuppressed().length);\n    }\n  }\n}\n```\n\nclose 0. Резкое завершение finally заменяет предшествующую причину выхода. Обычный finally не добавляет исходную ошибку в suppressed автоматически. Return в finally тоже способен скрыть исключение.\n\n## Вопросы на собеседовании\n\n1. Как сохранить обе причины?\n2. Что произойдёт с return из try?\n3. Какой механизм выбрать для ресурса?\n\nУберите return из finally. Для AutoCloseable используйте try-with-resources: ошибка основной операции останется основной, ошибка закрытия попадёт в suppressed.\n\n[JLS 21 · Exceptions](https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html)",
+    "exercise": {
+      "code": "try { throw new IOException(\"read\"); } finally { return \"\"; }",
+      "prompt": "Что увидит вызывающий код? Уберите потерю причины ошибки.",
+      "solution": "Return из finally заменит исключение результатом \"\". Уберите return и выполняйте там только очистку."
+    },
+    "interview": {
+      "question": "What happens if a finally block throws another exception?",
+      "answer": "An abrupt completion of finally can replace the earlier return or exception. That can make production diagnostics misleading. For resources I use try-with-resources, which preserves a primary exception and records close failures as suppressed exceptions."
+    },
+    "num": 160,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "try-with-resources",
+    "title": "Try-with-resources: в каком порядке закрываются ресурсы?",
+    "summary": "Парсер прочитал повреждённую строку. При закрытии входного потока тоже произошла ошибка. Какую из них получит вызывающий код?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Resource implements AutoCloseable {\n      public void close() {\n        throw new IllegalStateException(\"close\");\n      }\n    }\n    try (var input = new Resource()) {\n      throw new IllegalArgumentException(\"parse\");\n    } catch (RuntimeException e) {\n      System.out.println(e.getMessage() + \"/\" + e.getSuppressed()[0].getMessage());\n    }\n  }\n}\n```\n\nparse/close. Успешно созданные ресурсы закрываются в обратном порядке. Если основная работа завершилась исключением, оно остаётся главным. Когда тело завершилось успешно, ошибка close сама может стать главным исключением.\n\n## Вопросы на собеседовании\n\n1. Что если создание второго ресурса не удалось?\n2. Где искать ошибку закрытия?\n3. Кто закрывает переданный извне поток?\n\nПервый уже созданный ресурс закроется. Смотрите getSuppressed и заранее определите владельца переданного ресурса.\n\n[JLS 21 · Exceptions](https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html)",
+    "exercise": {
+      "code": "finally { input.close(); }",
+      "prompt": "Как проверить, что при ошибке чтения и close читатель увидит обе причины?",
+      "solution": "Смоделируйте обе ошибки в try-with-resources. Проверьте главное исключение чтения и ошибку закрытия в getSuppressed()."
+    },
+    "interview": {
+      "question": "How does try-with-resources preserve failures during cleanup?",
+      "answer": "Try-with-resources gives deterministic cleanup for resources that were successfully opened. It closes in reverse declaration order and preserves failures from both the body and cleanup. Ownership still matters: I do not close a caller-owned stream unless the API says so."
+    },
+    "num": 161,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "stack-overflow-vs-oom",
+    "title": "StackOverflowError или OutOfMemoryError: где искать причину?",
+    "summary": "После загрузки циклической иерархии сервис падает в одном методе. Увеличение heap оставило прежнюю ошибку.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Walk {\n      void visit() {\n        visit();\n      }\n    }\n    try {\n      new Walk().visit();\n    } catch (StackOverflowError observed) {\n      System.out.println(\"recursive call chain\");\n    }\n  }\n}\n```\n\nУчебный пример ловит ошибку только для наблюдения. Рекурсия без остановки накапливает кадры одного стека. OutOfMemoryError означает, что запрошенное выделение не удалось; его область уточняют по сообщению и метрикам.\n\n## Вопросы на собеседовании\n\n1. Почему больший heap не устраняет цикл?\n2. Чем переписать обход?\n3. Означает ли OOME обязательно утечку?\n\nДобавьте visited и итеративный обход. OOME возможен также из-за лимита или пика нагрузки. В сервисе сохраните диагностику и определите политику восстановления процесса.\n\n[JLS 21 · Exceptions](https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html)",
+    "exercise": {
+      "code": "void walk(Node n) { walk(n.parent); }",
+      "prompt": "Обход безусловен, а родители могут образовать цикл. Предложите два условия завершения.",
+      "solution": "Проверяйте конец цепочки и посещённые узлы. Для большой допустимой глубины используйте цикл или собственный стек."
+    },
+    "interview": {
+      "question": "How would you distinguish stack exhaustion from heap exhaustion?",
+      "answer": "Stack overflow points to excessive call depth, often recursion without a valid stop condition. Out-of-memory errors require identifying the allocation domain. Increasing a heap limit cannot fix an unbounded call chain, and catching an Error is not a general recovery strategy."
+    },
+    "num": 162,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "functional-interface",
+    "title": "Что обещает функциональный интерфейс?",
+    "summary": "Нужно получить число из конфигурации, преобразовать его, отфильтровать и отправить результат в журнал. Для каждой роли подходит разная сигнатура.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.function.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    Supplier<Integer> read = () -> 21;\n    Function<Integer, Integer> doubleIt = n -> n * 2;\n    Predicate<Integer> allowed = n -> n > 0;\n    Consumer<Integer> log = System.out::println;\n    int result = doubleIt.apply(read.get());\n    if (allowed.test(result)) log.accept(result);\n  }\n}\n```\n\n42. Supplier даёт значение, Function преобразует, Predicate отвечает да/нет, Consumer выполняет действие. Лямбда получает тип из контекста одного абстрактного метода; у интерфейса могут быть default и static методы.\n\n## Вопросы на собеседовании\n\n1. Зачем @FunctionalInterface?\n2. Для чего IntPredicate?\n3. Вызывается ли Supplier при его объявлении?\n\nАннотация проверяет контракт при компиляции. Примитивные варианты уменьшают boxing. Действие запускает вызов метода интерфейса.\n\n[Java 21 · Streams](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)",
+    "exercise": {
+      "code": "Supplier<Integer> price = () -> 20;",
+      "prompt": "В журнал передали сам price. Как получить число и передать его Consumer<Integer>?",
+      "solution": "Вызовите log.accept(price.get()). Ссылка на Supplier описывает действие, но сама не запускает его."
+    },
+    "interview": {
+      "question": "How do you choose a functional interface for a callback?",
+      "answer": "A functional interface has a single abstract method contract. The target type gives a lambda its argument and result types. I select Supplier, Consumer, Function or Predicate according to data flow, and use primitive specializations when boxing matters."
+    },
+    "num": 163,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "lambda-or-anonymous",
+    "title": "Лямбда и анонимный класс: на кого указывает this?",
+    "summary": "Слушатель регистрирует сам себя вместо владельца формы. После замены анонимного класса лямбдой значение this изменилось.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Owner {\n      String name() {\n        return \"owner\";\n      }\n\n      void run() {\n        Runnable lambda = () -> System.out.println(this.name());\n        Runnable anon =\n            new Runnable() {\n              String name() {\n                return \"listener\";\n              }\n\n              public void run() {\n                System.out.println(this.name());\n              }\n            };\n        lambda.run();\n        anon.run();\n      }\n    }\n    new Owner().run();\n  }\n}\n```\n\nowner, затем listener. Лямбда использует лексический this, у анонимного класса есть собственный экземпляр. Локальная переменная, которую захватывает любой вариант, должна быть final или effectively final.\n\n## Вопросы на собеседовании\n\n1. Можно ли менять поля захваченного объекта?\n2. Что если переприсвоить саму локальную переменную?\n3. Когда нужен анонимный класс?\n\nСодержимое доступно согласно обычным правилам. Переприсваивание захваченной переменной запрещено. Анонимный класс подходит, когда нужно собственное состояние экземпляра или несколько методов.\n\n[Java 21 · Streams](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)",
+    "exercise": {
+      "code": "Runnable r = () -> register(this);",
+      "prompt": "Какой объект попадёт в реестр? Что поменяется в анонимном Runnable?",
+      "solution": "В лямбде this обозначает владельца. В теле анонимного Runnable это экземпляр Runnable."
+    },
+    "interview": {
+      "question": "What does this refer to inside a lambda?",
+      "answer": "A lambda uses the enclosing this and captures effectively final local variables. An anonymous class introduces its own this and can declare fields. Capturing a stable reference does not make the referenced object immutable or thread-safe."
+    },
+    "num": 164,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "stream-pipeline",
+    "title": "Stream API: когда выполняются filter и map?",
+    "summary": "Сервис построил обработку заказов, но счётчик обработанных записей остался нулевым. Когда начинается обход?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.stream.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var prices = Stream.of(1, 2, 3).filter(n -> n > 1).map(n -> n * 10);\n    System.out.println(\"built\");\n    System.out.println(prices.findFirst().orElseThrow());\n  }\n}\n```\n\nСначала built, затем 20. Источник описывает элементы; промежуточные операции строят ленивый конвейер. Терминальная findFirst запрашивает первый подходящий результат и может остановить обход. Не полагайтесь на peek для обязательных бизнес-эффектов: оптимизации могут пропустить этап.\n\n## Вопросы на собеседовании\n\n1. Все ли элементы пройдут map?\n2. Почему count иногда не вызывает peek?\n3. Как безопасно собрать результаты?\n\nОстановка зависит от терминальной операции. Для источника известного размера count иногда не нужен обход. Для данных используйте map и collect/toList, для обязательного действия — явный этап обработки.\n\n[Java 21 · Streams](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)",
+    "exercise": {
+      "code": "rows.stream().peek(this::save).count();",
+      "prompt": "Можно ли обещать, что save будет вызван для каждой строки? Как явно выразить обязательное действие?",
+      "solution": "Нет: count может вычисляться без обхода. Для обязательного сохранения задайте явный проход и политику ошибок записи."
+    },
+    "interview": {
+      "question": "When does a stream pipeline start processing elements?",
+      "answer": "A stream pipeline starts with a source, adds lazy transformations and ends with a terminal operation. Short-circuiting can avoid visiting elements, and some operations can be optimized away. I keep transformations pure and do not depend on side effects in intermediate stages."
+    },
+    "num": 165,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "stream-flatmap",
+    "title": "map или flatMap: как получить товары из всех заказов?",
+    "summary": "Каждый заказ содержит список товаров. После map программа получила список списков вместо единого отчёта по товарам.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var orders = List.of(List.of(\"tea\", \"milk\"), List.of(\"bread\"));\n    System.out.println(orders.stream().map(List::size).toList());\n    System.out.println(orders.stream().flatMap(List::stream).toList());\n  }\n}\n```\n\n[2, 1] и [tea, milk, bread]. map создаёт одно значение для каждого входа. flatMap открывает поток результатов каждого заказа и объединяет их элементы. Пустой заказ добавляет ноль элементов.\n\n## Вопросы на собеседовании\n\n1. Что вернёт map(List::stream)?\n2. Как пропустить пустые заказы?\n3. Сохраняется ли порядок у упорядоченного последовательного потока?\n\nmap создаст поток потоков. flatMap естественно обойдёт пустой подсписок. При таком источнике и toList порядок встречи сохранится.\n\n[Java 21 · Streams](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)",
+    "exercise": {
+      "code": "orders.stream().map(List::stream).toList();",
+      "prompt": "Измените один этап, чтобы получить плоский список товаров.",
+      "solution": "Замените map на flatMap(List::stream); каждое значение downstream будет товаром."
+    },
+    "interview": {
+      "question": "When would you use flatMap instead of map?",
+      "answer": "Map transforms one element into one output value. FlatMap lets each input supply a stream of zero or more outputs, then flattens those streams. I use it when the downstream operation should see individual items instead of nested containers."
+    },
+    "num": 166,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "stream-single-use",
+    "title": "Почему Stream нельзя читать второй раз?",
+    "summary": "Отчёт сначала считает строки, затем пытается вывести их из того же Stream.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var data = List.of(1, 2, 3);\n    var stream = data.stream();\n    System.out.println(stream.count());\n    try {\n      stream.toList();\n    } catch (IllegalStateException e) {\n      System.out.println(\"consumed\");\n    }\n  }\n}\n```\n\n3 и consumed в этой реализации. Контракт требует одного использования pipeline. Для повторного обхода списка создайте новый stream. У сетевого источника новый обход может заново получить уже другие данные.\n\n## Вопросы на собеседовании\n\n1. Когда стоит материализовать список?\n2. Всегда ли повторное использование будет обнаружено?\n3. Как сделать два обхода одного снимка?\n\nСохраните результат toList при допустимом объёме данных. Обнаружение повторного использования не является протоколом проверки. Для стабильной коллекции вызывайте stream заново.\n\n[Java 21 · Streams](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)",
+    "exercise": {
+      "code": "long size = s.count(); return s.toList();",
+      "prompt": "Источник — список. Перепишите, чтобы оба результата были доступны.",
+      "solution": "Сохраните коллекцию и вызывайте stream() заново либо материализуйте один результат и возьмите его size()."
+    },
+    "interview": {
+      "question": "How can you run two operations over the same stream source?",
+      "answer": "A stream is a single-use traversal, not a reusable collection. When two computations need the same inputs, I can combine the reductions or materialize a bounded snapshot. Reopening a live source can have a different cost and may return different data."
+    },
+    "num": 167,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "optional-fallback",
+    "title": "Optional: почему запасной запрос выполняется даже при попадании в кэш?",
+    "summary": "Для значения из кэша сервис всё равно вызвал дорогую загрузку. Найдите место вычисления аргумента.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\nimport java.util.function.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    Supplier<String> load =\n        () -> {\n          System.out.println(\"load\");\n          return \"db\";\n        };\n    var hit = Optional.of(\"cache\");\n    System.out.println(hit.orElse(load.get()));\n    System.out.println(hit.orElseGet(load));\n  }\n}\n```\n\nload появится только перед первым cache. Аргумент orElse вычисляется до вызова метода. orElseGet вызывает поставщик только при отсутствии. map преобразует содержимое, а flatMap принимает функцию, которая уже возвращает Optional.\n\n## Вопросы на собеседовании\n\n1. Что даст Optional.ofNullable(null)?\n2. Где лучше использовать Optional?\n3. Почему не подойдёт Optional для сообщения о причине ошибки?\n\nДля отсутствия значения подходит empty как результат поиска. Причины отказа требуют отдельной модели ошибок. Для дорогого запасного пути выбирайте orElseGet.\n\n[Java 21 · Streams](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)",
+    "exercise": {
+      "code": "return hit.orElse(client.fetch());",
+      "prompt": "Клиент вызывается при попадании в кэш. Сделайте загрузку ленивой.",
+      "solution": "Используйте hit.orElseGet(client::fetch)."
+    },
+    "interview": {
+      "question": "When is orElseGet preferable to orElse?",
+      "answer": "Optional represents an absent result without encoding the cause of failure. I compose transformations with map or flatMap and use orElseGet for an expensive fallback. Passing an already computed argument to orElse makes its evaluation eager."
+    },
+    "num": 168,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "jdk-jre-jvm",
+    "title": "JDK, JRE и JVM: кто запускает сервис?",
+    "summary": "В контейнере java запускается, а javac отсутствует. Можно ли выполнить уже собранное приложение?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    System.out.println(Runtime.version().feature());\n    System.out.println(System.getProperty(\"java.vm.name\"));\n  }\n}\n```\n\nНа Java 21 первая строка равна 21, вторая называет реализацию VM. javac из JDK компилирует исходник в class-файл с байткодом. JVM загружает и исполняет классы. Для запуска нужны также библиотеки среды выполнения. В современных поставках возможен минимальный runtime, собранный jlink.\n\n## Вопросы на собеседовании\n\n1. Нужен ли javac для готового jar?\n2. Где проверить версию байткода?\n3. Что даст запуск слишком нового класса на старой JVM?\n\nДля готового байткода компилятор не нужен. javap -verbose показывает major version. Неподдерживаемый формат класса приводит к UnsupportedClassVersionError.\n\n[JVM Specification 21](https://docs.oracle.com/javase/specs/jvms/se21/html/index.html)",
+    "exercise": {
+      "code": "javac --release 21 Demo.java",
+      "prompt": "Можно ли запустить результат на Java 17, если исходник не использует новых конструкций?",
+      "solution": "Нет. --release 21 допускает class-файл Java 21. Для Java 17 соберите с --release 17 и совместимыми зависимостями."
+    },
+    "interview": {
+      "question": "What roles do the JDK and JVM play when running Java code?",
+      "answer": "The JDK includes development and diagnostic tools. A runtime image supplies the VM and the libraries the application needs. I compile to a compatible class-file target and verify the deployed runtime, especially when building a reduced image for containers."
+    },
+    "num": 169,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "stack-heap",
+    "title": "Stack vs Heap: две ссылки на один заказ",
+    "summary": "Метод вернул объект из локальной переменной. Почему заказ продолжает существовать после выхода из метода?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Orders {\n      StringBuilder create() {\n        var text = new StringBuilder(\"101\");\n        return text;\n      }\n    }\n    var a = new Orders().create();\n    var b = a;\n    b.append(\"-paid\");\n    System.out.println(a);\n  }\n}\n```\n\n101-paid. В модели JVM стек потока содержит кадры вызовов с локальными переменными и стеком операндов. Переменная может содержать ссылку. Объекты и массивы принадлежат общей куче, ссылки также могут находиться в полях других объектов. После выхода create его кадр исчезает, а объект достижим через a. JIT может устранять физические выделения при сохранении поведения.\n\n## Вопросы на собеседовании\n\n1. Где лежит поле-ссылка объекта?\n2. Почему выход из метода не запускает немедленное удаление?\n3. Является ли стек общим для потоков?\n\nПоле входит в состояние объекта. Освобождение зависит от достижимости и работы GC. У каждого JVM-потока собственный стек вызовов.\n\n[JVM Specification 21](https://docs.oracle.com/javase/specs/jvms/se21/html/index.html)",
+    "exercise": {
+      "code": "var b = a; b.append(\"-paid\");",
+      "prompt": "Какая операция нужна, чтобы сохранить исходный текст в a неизменным?",
+      "solution": "Для изменяемого текста создайте копию, например new StringBuilder(a.toString()), либо используйте неизменяемую строку."
+    },
+    "interview": {
+      "question": "Where does a local reference live, and what keeps its object alive?",
+      "answer": "A thread stack holds frames for active calls, including local slots that can contain references. The heap is the shared allocation domain for objects in the JVM model. Returning a reference lets an object outlive a frame. Optimizations may remove an allocation without changing the program's observable behavior."
+    },
+    "num": 170,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "gc-stop-the-world",
+    "title": "Stop-the-world: почему p99 вырос при свободном ядре?",
+    "summary": "На графике HTTP появился пик задержки. В логах JVM в тот же интервал видна пауза. Как проверить причинную связь?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    long before = System.nanoTime();\n    Thread.sleep(10);\n    System.out.println(\"elapsed ns: \" + (System.nanoTime() - before));\n  }\n}\n```\n\nЭтот таймер показывает прошедшее время и сам не отличит сон, вытеснение или паузу JVM. При stop-the-world JVM приостанавливает прикладные Java-потоки для определённой работы, например части GC. Не вся работа сборщика проходит в паузах; safepoint возможен и по иным причинам.\n\n## Вопросы на собеседовании\n\n1. Как сопоставить паузу и запрос?\n2. Что смотреть помимо среднего?\n3. Какие логи включить на HotSpot 21?\n\nЗапустите с -Xlog:gc*,safepoint и сравните длительности и временные окна с трассировками. Один совпавший пик ещё не объясняет все задержки.\n\n[HotSpot 21 · GC Tuning Guide](https://docs.oracle.com/en/java/javase/21/gctuning/)",
+    "exercise": {
+      "code": "long elapsed = System.nanoTime() - start;",
+      "prompt": "Метрика выросла до 200 мс. Какие два набора событий нужны до вывода о GC-паузе?",
+      "solution": "Сопоставьте временную шкалу запроса с GC/safepoint событиями. Затем сравните повторяющиеся пики и профили."
+    },
+    "interview": {
+      "question": "How can a GC pause affect the latency of a request?",
+      "answer": "A stop-the-world phase suspends application threads for specific VM work. A request waiting for CPU or a lock can also show a long elapsed time. I correlate GC and safepoint events with request timelines and latency percentiles before changing collector settings."
+    },
+    "num": 171,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "heap-retention",
+    "title": "Утечка памяти в Java: кто удерживает старые ответы?",
+    "summary": "Список завершённых запросов растёт, хотя после отправки ответа данные больше никому не нужны.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var history = new ArrayList<byte[]>();\n    for (int i = 0; i < 100; i++) history.add(new byte[1024]);\n    System.out.println(history.size());\n  }\n}\n```\n\n100. Для бизнеса ответы устарели, для GC они достижимы через history. Если такой список хранится всё время жизни сервиса, live set растёт вместе с количеством запросов. Ограничьте объём, время хранения или удаляйте записи по окончании операции.\n\n## Вопросы на собеседовании\n\n1. Всегда ли рост used heap означает утечку?\n2. Что искать в dump?\n3. Почему ограничение числа записей может быть недостаточным?\n\nСравните удерживаемый объём после сборок под похожей нагрузкой. Ищите цепочку к корню и владельца. Объекты разного размера требуют бюджета по весу.\n\n[HotSpot 21 · GC Tuning Guide](https://docs.oracle.com/en/java/javase/21/gctuning/)",
+    "exercise": {
+      "code": "static final List<byte[]> finished = new ArrayList<>();",
+      "prompt": "Куда исчезнут данные завершённых запросов через час? Предложите ограничение срока жизни.",
+      "solution": "Пока класс загружен и список достижим, ответы остаются. Удаляйте по сроку или храните только ограниченное число агрегатов."
+    },
+    "interview": {
+      "question": "How can a Java application leak memory despite garbage collection?",
+      "answer": "A managed heap can leak through unintended retention. The collector correctly preserves objects reachable from application roots even when the business no longer needs them. I look for a growing retained set and fix the owner or lifecycle."
+    },
+    "num": 172,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "class-loading",
+    "title": "ClassLoader: когда класс загружен и когда проинициализирован?",
+    "summary": "Плагин должен зарегистрироваться в static-блоке. Его class-файл найден, но запись в реестре ещё не появилась.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Plugin {\n      static {\n        System.out.println(\"initialized\");\n      }\n    }\n    var type = Class.forName(Plugin.class.getName(), false, Plugin.class.getClassLoader());\n    System.out.println(\"loaded\");\n    Class.forName(type.getName(), true, type.getClassLoader());\n  }\n}\n```\n\nloaded, затем initialized. Loading получает определение класса. Linking включает проверку, подготовку и разрешение символических ссылок, часть которого может быть отложена. Initialization выполняет статические инициализаторы при активном использовании. Получение class-литерала само по себе не запускает инициализацию.\n\n## Вопросы на собеседовании\n\n1. Почему имя класса недостаточно для его идентичности?\n2. Можно ли выгрузить один плагин?\n3. Что если static-блок бросил исключение?\n\nИдентичность включает определяющий загрузчик. Для разгрузки должны исчезнуть удерживающие ссылки на загрузчик и его классы. Ошибка инициализации делает класс ошибочным для этого определения.\n\n[JVM Specification 21](https://docs.oracle.com/javase/specs/jvms/se21/html/index.html)",
+    "exercise": {
+      "code": "Class.forName(pluginName, false, loader);",
+      "prompt": "Запустится ли static-блок? Как отдельно запросить инициализацию?",
+      "solution": "Нет. Для явной инициализации вызовите Class.forName(name, true, loader)."
+    },
+    "interview": {
+      "question": "When does the JVM initialize a class?",
+      "answer": "Loading, linking and initialization are distinct. A class can be loaded without executing its static initializer. Runtime type identity includes the defining class loader, which matters for plugins, casts and class unloading."
+    },
+    "num": 173,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "jit-warmup",
+    "title": "JIT: почему первые запросы сервиса медленнее?",
+    "summary": "Одна и та же функция расчёта вызывается миллион раз. После старта её профиль выполнения постепенно меняется.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Pricing {\n      static int fee(int cents) {\n        return cents / 10;\n      }\n    }\n    long sum = 0;\n    for (int i = 0; i < 1_000_000; i++) sum += Pricing.fee(i);\n    System.out.println(sum);\n  }\n}\n```\n\nHotSpot собирает профиль и может компилировать горячие методы или циклы в машинный код. Инлайнинг убирает границу вызова. Спекулятивные предположения могут перестать выполняться, тогда возможна деоптимизация. Один замер цикла смешивает загрузку классов, прогрев и сами вычисления.\n\n## Вопросы на собеседовании\n\n1. Как увидеть события компиляции?\n2. Зачем возвращать результат бенчмарка?\n3. Доказывает ли второй быстрый запуск пользу JIT?\n\nПосмотрите -XX:+PrintCompilation или запись JFR. Для микротеста используйте JMH с прогревом, несколькими fork и потреблением результата. В реальном сервисе сравните профиль запуска и установившейся нагрузки.\n\n[JVM Specification 21](https://docs.oracle.com/javase/specs/jvms/se21/html/index.html)",
+    "exercise": {
+      "code": "for (int i = 0; i < n; i++) price(i);",
+      "prompt": "Результат вычисления отброшен. Почему это плохой микробенчмарк и что изменить?",
+      "solution": "JIT может устранить работу с неиспользованным результатом. Возвращайте результат из JMH benchmark либо используйте Blackhole."
+    },
+    "interview": {
+      "question": "Why does a benchmark need a warm-up phase?",
+      "answer": "HotSpot uses profiling to compile hot execution paths and may inline calls based on observed behavior. Invalidated assumptions can cause deoptimization. I separate startup from steady state and use a benchmark harness to avoid measuring dead-code elimination or a single compilation event."
+    },
+    "num": 174,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "native-memory",
+    "title": "Metaspace и direct memory: почему RSS больше heap?",
+    "summary": "В контейнере свободна часть Java heap, но процесс растёт. Сетевой клиент использует прямые буферы, сервис загружает плагины.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.lang.management.ManagementFactory;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var buffer = java.nio.ByteBuffer.allocateDirect(4096);\n    System.out.println(buffer.isDirect());\n    ManagementFactory.getPlatformMXBeans(java.lang.management.BufferPoolMXBean.class)\n        .forEach(p -> System.out.println(p.getName()));\n  }\n}\n```\n\nОбъект ByteBuffer достижим из Java, а содержимое direct-буфера размещено вне обычной кучи. В HotSpot метаданные классов используют Metaspace. К RSS также добавляют стеки, код и другие области. Xmx ограничивает только Java heap.\n\n## Вопросы на собеседовании\n\n1. Почему плагины удерживают Metaspace?\n2. Что измеряет BufferPoolMXBean?\n3. Чем посмотреть разбивку native memory?\n\nПроверьте удержание загрузчиков. Для HotSpot включите Native Memory Tracking при старте и снимите jcmd VM.native_memory summary. NMT не покрывает все сторонние выделения.\n\n[JVM Specification 21](https://docs.oracle.com/javase/specs/jvms/se21/html/index.html)",
+    "exercise": {
+      "code": "ByteBuffer.allocateDirect(1024 * 1024);",
+      "prompt": "Как проверить рост буферов, если heap выглядит стабильным?",
+      "solution": "Сравните объём direct pool через BufferPoolMXBean и RSS при одинаковой нагрузке. Посмотрите жизненный цикл буферов."
+    },
+    "interview": {
+      "question": "What memory can a JVM process use outside the Java heap?",
+      "answer": "The process memory budget includes more than the Java heap. Direct buffers, class metadata, thread stacks and compiled code all contribute. I identify the growing domain before tuning limits and correlate class-loader counts, buffer pools and native memory tracking."
+    },
+    "num": 175,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "oom-investigation",
+    "title": "Как расследовать OutOfMemoryError?",
+    "summary": "В одном сервисе сообщение Java heap space, в другом — Metaspace. Один и тот же рост Xmx не объяснит обе причины.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.lang.management.ManagementFactory;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var usage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();\n    System.out.println(\"used=\" + usage.getUsed() + \" max=\" + usage.getMax());\n    System.out.println(\n        \"classes=\" + ManagementFactory.getClassLoadingMXBean().getLoadedClassCount());\n  }\n}\n```\n\nЭто базовые показатели, не диагноз. Сохраните точное сообщение, лимит контейнера, динамику live set и недавние изменения нагрузки. Для heap исследуйте dominator tree, retained size и путь к GC roots. Для Metaspace сравните число классов и загрузчиков, для direct memory — буферные пулы.\n\n## Вопросы на собеседовании\n\n1. Когда пригодится HeapDumpOnOutOfMemoryError?\n2. Что даст JFR?\n3. Почему контейнер мог умереть без Java OOME?\n\nПредусмотрите место для dump и ограничьте доступ к содержащимся в нём данным. JFR помогает найти источники выделений. OOM kill со стороны ОС может завершить процесс без исключения JVM.\n\n[HotSpot 21 · GC Tuning Guide](https://docs.oracle.com/en/java/javase/21/gctuning/)",
+    "exercise": {
+      "code": "java.lang.OutOfMemoryError: Metaspace",
+      "prompt": "Что исследовать до изменения Xmx и как проверить гипотезу об утечке загрузчиков?",
+      "solution": "Сравните динамику загруженных классов, число загрузчиков и удерживающие их пути. Xmx не является лимитом Metaspace."
+    },
+    "interview": {
+      "question": "What evidence would you collect after an OutOfMemoryError?",
+      "answer": "I start with the error message and process limits, then identify whether the failing allocation is heap, class metadata, a buffer or a native thread. Heap dumps explain retention; allocation profiling explains creation rates. A container kill requires checking operating-system evidence as well."
+    },
+    "num": 176,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "runnable-callable-future",
+    "title": "Runnable, Callable и Future: кто выполняет и кто получает результат?",
+    "summary": "Обработчик отправил расчёт доставки в пул. Где хранится число и как узнает об ошибке вызывающий код?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    try (var pool = Executors.newSingleThreadExecutor()) {\n      Callable<Integer> rate = () -> 300;\n      Future<Integer> result = pool.submit(rate);\n      System.out.println(result.get());\n    }\n  }\n}\n```\n\n300. Runnable описывает действие без результата и не объявляет checked exceptions. Callable возвращает значение и может бросить исключение. Future представляет завершение: get ждёт и передаёт ошибку через ExecutionException. Для цепочки зависимых этапов CompletableFuture даёт thenApply, thenCompose и объединение.\n\n## Вопросы на собеседовании\n\n1. Что вернёт submit(Runnable).get()?\n2. Чем Future отличается от CompletableFuture?\n3. Останавливает ли timeout в get исполнителя?\n\nУспешное действие обычно даёт null. Для цепочки преобразований удобен CompletionStage. Тайм-аут ограничивает ожидание, остановка требует отдельной поддержки.\n\n[Java 21 · ThreadPoolExecutor](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html)",
+    "exercise": {
+      "code": "Future<?> f = pool.submit(() -> { calculate(); });",
+      "prompt": "Как получить число из calculate через get? Перепишите тело задачи.",
+      "solution": "Передайте Callable<Integer>: pool.submit(() -> calculate()), если calculate возвращает int. Ошибку получите через get()."
+    },
+    "interview": {
+      "question": "How do Runnable, Callable, Future and CompletableFuture fit together?",
+      "answer": "Runnable and Callable describe work. A Future represents its eventual completion and exposes blocking retrieval or cancellation. CompletableFuture also lets me compose dependent stages. I select the task type by its result and exception contract and handle timeouts separately from cancellation."
+    },
+    "num": 177,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "executor-rejection",
+    "title": "Переполнение очереди: что получит отправитель?",
+    "summary": "Импорт занял единственный worker. Вторая задача уже стоит в ограниченной очереди. Нужно решить судьбу третьей до потери SLA.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var gate = new CountDownLatch(1);\n    try (var p = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1))) {\n      p.submit(\n          () -> {\n            gate.await();\n            return 1;\n          });\n      p.submit(() -> 2);\n      try {\n        p.submit(() -> 3);\n      } catch (RejectedExecutionException e) {\n        System.out.println(\"rejected\");\n      } finally {\n        gate.countDown();\n      }\n    }\n  }\n}\n```\n\nrejected. Стандартная AbortPolicy бросает исключение при невозможности принять задачу. CallerRunsPolicy до остановки заставляет отправителя выполнить её самому. Это может сдержать входящий поток, но задержать HTTP или event loop. Политики тихого удаления опасны для обещанных результатов.\n\n## Вопросы на собеседовании\n\n1. Что с отказом после shutdown?\n2. Может ли submit при молчаливом discard вернуть незавершающийся Future?\n3. Где учитывать отказ?\n\nДа: подберите политику, которая завершает или отклоняет задачу наблюдаемым способом. Фиксируйте отказ у отправителя и определите ответ клиенту.\n\n[Java 21 · ThreadPoolExecutor](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html)",
+    "exercise": {
+      "code": "pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());",
+      "prompt": "Клиент ждёт результат отклонённой submit-задачи. Где должна появиться наблюдаемая ошибка?",
+      "solution": "Используйте явный отказ с исключением или обработчик, завершающий обещанный результат и сообщающий о перегрузке."
+    },
+    "interview": {
+      "question": "What happens when a bounded executor can no longer accept a task?",
+      "answer": "A saturated bounded executor needs an explicit rejection policy. Failing fast makes overload visible. Running work on the caller can apply pressure but may block a critical thread. I avoid silently discarding a submitted task when someone is waiting on its future."
+    },
+    "num": 178,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "coordination-primitives",
+    "title": "Semaphore, CountDownLatch или CyclicBarrier?",
+    "summary": "Три требования звучат похоже: ограничить число обращений к партнёру, дождаться прогрева узлов, синхронизировать участников каждого раунда теста.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var limit = new Semaphore(1);\n    var ready = new CountDownLatch(1);\n    var round = new CyclicBarrier(1);\n    limit.acquire();\n    try {\n      ready.countDown();\n      round.await();\n    } finally {\n      limit.release();\n    }\n    System.out.println(ready.getCount() + \" \" + limit.availablePermits());\n  }\n}\n```\n\n0 1. Semaphore считает доступные разрешения, каждое успешное приобретение требует возврата. Latch открывается при нуле один раз. Barrier открывается по прибытии всех участников и может использоваться в следующем раунде. В примере один участник для запуска без гонки; при двух один await будет ждать второго.\n\n## Вопросы на собеседовании\n\n1. Что если поставить barrier на 8 задач в пуле из 4?\n2. Можно ли переоткрыть latch?\n3. Как обработать исключение после acquire?\n\nНе блокируйте всех работников до старта оставшихся участников. Создайте новый latch для новой фазы. Возвращайте только реально полученное разрешение в finally.\n\n[Java 21 · java.util.concurrent](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html)",
+    "exercise": {
+      "code": "var barrier = new CyclicBarrier(8);",
+      "prompt": "Почему восемь задач в пуле из четырёх могут навсегда застрять в await?",
+      "solution": "Четыре занятых работника ждут ещё четверых, которые не могут стартовать. Согласуйте размер пула или измените протокол."
+    },
+    "interview": {
+      "question": "How do a semaphore, a latch and a barrier differ?",
+      "answer": "A semaphore limits concurrent ownership of permits. A latch represents one completion threshold. A cyclic barrier coordinates a known set of participants at repeated phase boundaries. I ensure enough participants can actually run and define what happens if one fails."
+    },
+    "num": 179,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "threadlocal-context",
+    "title": "ThreadLocal: кому принадлежит request id?",
+    "summary": "Два обработчика используют один статический ThreadLocal. Почему запись имени в одном потоке не видна другому?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var context = new ThreadLocal<String>();\n    context.set(\"caller\");\n    try (var pool = Executors.newSingleThreadExecutor()) {\n      System.out.println(pool.submit(context::get).get());\n    }\n    System.out.println(context.get());\n    context.remove();\n  }\n}\n```\n\nnull, затем caller. Ключ общий, значение выбирается для текущего потока. Обычный ThreadLocal не переносит контекст автоматически при переходе на executor. ThreadLocal.withInitial может создавать начальное значение при первом get.\n\n## Вопросы на собеседовании\n\n1. Когда remove нужен?\n2. Что если запрос сменил поток?\n3. Подходит ли это вместо параметра для бизнес-данных?\n\nЗадавайте границу жизни значения. Для асинхронных переходов передавайте контекст явно или через согласованный механизм фреймворка. Бизнес-зависимости часто проще сделать параметрами.\n\n[Java 21 · java.util.concurrent](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html)",
+    "exercise": {
+      "code": "context.set(\"request-7\"); pool.submit(context::get);",
+      "prompt": "Почему worker может вернуть null? Передайте нужное значение явно.",
+      "solution": "Захватите нужное значение до submit и передайте его как параметр задачи. Для контекста фреймворка проверьте механизм распространения."
+    },
+    "interview": {
+      "question": "Who owns a value stored in a ThreadLocal?",
+      "answer": "ThreadLocal associates a value with the current thread, not with an HTTP request. Moving work to another executor changes the lookup context. I keep ownership explicit and arrange propagation and cleanup at well-defined boundaries."
+    },
+    "num": 180,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "threadlocal-pool-leak",
+    "title": "Почему следующий запрос увидел пользователя предыдущего?",
+    "summary": "Пул из одного рабочего потока сначала обслуживает Анну, затем запрос без авторизации. Первый обработчик забыл убрать контекст.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var user = new ThreadLocal<String>();\n    try (var p = Executors.newSingleThreadExecutor()) {\n      p.submit(() -> user.set(\"Anna\")).get();\n      System.out.println(p.submit(user::get).get());\n      p.submit(user::remove).get();\n    }\n  }\n}\n```\n\nAnna. Задачи разные, worker один и тот же. Значение живёт дольше запроса; крупный объект также может удерживать память. При обычном верхнеуровневом контексте оберните set и обработку в try/finally с remove на том же работнике.\n\n## Вопросы на собеседовании\n\n1. Поможет ли remove в вызывающем потоке?\n2. Почему слабый ключ не решает проблему?\n3. Что с вложенным контекстом?\n\nОчищать нужно рабочий поток. Значение может оставаться в карте живого потока. При вложенных областях сохраните и восстановите прежнее значение, если этого требует контракт.\n\n[Java 21 · java.util.concurrent](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html)",
+    "exercise": {
+      "code": "user.set(request.user()); handle(request);",
+      "prompt": "Куда поместить remove, если handle бросит исключение?",
+      "solution": "Оберните handle в try/finally, вызовите user.remove() в finally того же потока. При вложении восстановите прошлое значение."
+    },
+    "interview": {
+      "question": "How can one request inherit another request’s ThreadLocal value?",
+      "answer": "Pool threads outlive requests, so thread-local state can leak identity as well as memory into later work. I bind and remove context on the worker in a finally block. For nested scopes I restore the previous context instead of blindly clearing it."
+    },
+    "num": 181,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "executor-shutdown",
+    "title": "Как остановить ExecutorService и дождаться задач?",
+    "summary": "Приложение завершает приём запросов. В очереди ещё есть запись аудита; нельзя просто завершить процесс.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var pool = Executors.newSingleThreadExecutor();\n    try {\n      pool.submit(() -> System.out.println(\"audit\"));\n      pool.shutdown();\n      if (!pool.awaitTermination(1, TimeUnit.SECONDS)) pool.shutdownNow();\n    } finally {\n      pool.close();\n    }\n  }\n}\n```\n\nshutdown прекращает приём новых задач и разрешает завершить уже принятые. awaitTermination ограничивает время ожидания вызывающего потока. shutdownNow запрашивает прерывание и возвращает задачи, которые ещё не начинались. Close в Java 21 может ждать окончания, поэтому это не жёсткий дедлайн остановки.\n\n## Вопросы на собеседовании\n\n1. Гарантирует ли shutdownNow мгновенную остановку?\n2. Что делать с возвращёнными задачами?\n3. Почему важен порядок остановки компонентов?\n\nСначала прекратите поступление работы, затем завершите или безопасно сохраните остаток. Задачи должны реагировать на прерывание; зависимые ресурсы остаются доступны до завершения потребителей.\n\n[Java 21 · ThreadPoolExecutor](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html)",
+    "exercise": {
+      "code": "pool.shutdown(); closeDatabase();",
+      "prompt": "Как не закрыть БД до завершения задач и что делать при истечении бюджета ожидания?",
+      "solution": "Дождитесь обработки принятых задач, при превышении бюджета запросите остановку и обработайте очередь. Закрывайте БД после пользователей."
+    },
+    "interview": {
+      "question": "How do you shut down an executor while preserving accepted work?",
+      "answer": "Shutdown rejects new submissions while draining accepted work. I wait within a budget, then escalate cancellation if appropriate and account for queued work that never started. Interrupts are cooperative, so a bounded wait is not proof that all effects have stopped."
+    },
+    "num": 182,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "structured-concurrency-21",
+    "title": "Structured Concurrency в Java 21: Preview API",
+    "summary": "Расчёту заказа нужны два обязательных ответа. Если один вызов завершился ошибкой, кто отменит соседний и дождётся окончания дочерних задач?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java --enable-preview --source 21 Demo.java` (preview в JDK 21).\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {\n      var tax = scope.fork(() -> 20);\n      var delivery = scope.fork(() -> 30);\n      scope.join().throwIfFailed();\n      System.out.println(tax.get() + delivery.get());\n    }\n  }\n}\n```\n\n50. Пример использует preview API именно JDK 21 (JEP 453). Запустите java --enable-preview --source 21 Demo.java. Scope связывает время жизни дочерних задач с блоком владельца. ShutdownOnFailure запрашивает остановку соседей при ошибке. Дочерний код должен уметь завершаться по прерыванию.\n\n## Вопросы на собеседовании\n\n1. Можно ли взять результат до join?\n2. Откатываются ли внешние записи?\n3. Как меняется код при переходе на другую версию JDK?\n\nПроверьте исход после join и throwIfFailed. Для внешних эффектов нужна собственная политика. Preview API может измениться; сверяйте документацию именно используемого JDK.\n\n[OpenJDK · JEP 453 (Preview)](https://openjdk.org/jeps/453)",
+    "exercise": {
+      "code": "var task = scope.fork(this::load); return task.get();",
+      "prompt": "Как владелец scope должен дождаться дочерней задачи и обработать сбой перед чтением?",
+      "solution": "Владелец вызывает scope.join().throwIfFailed(), а затем task.get() внутри области try-with-resources."
+    },
+    "interview": {
+      "question": "How does structured concurrency manage sibling tasks in Java 21?",
+      "answer": "In JDK 21 structured concurrency is a preview API. A task scope gives related subtasks a shared lifetime and failure policy. ShutdownOnFailure can request sibling cancellation, but interruption still needs cooperation and cannot roll back completed external operations."
+    },
+    "num": 183,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "record-compact-constructor",
+    "title": "Compact constructor: где проверить вход record?",
+    "summary": "Запрос пришёл с пробелами в валюте и отрицательной суммой. Хотим исключить некорректный объект сразу при создании.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    record Price(String currency, int cents) {\n      Price {\n        currency = currency.strip().toUpperCase(Locale.ROOT);\n        if (cents < 0) throw new IllegalArgumentException(\"negative amount\");\n      }\n    }\n    System.out.println(new Price(\" eur \", 100));\n  }\n}\n```\n\nPrice[currency=EUR, cents=100]. Compact constructor работает с параметрами компонентов. После его нормального завершения значения присваиваются полям автоматически. Здесь удобно нормализовать и сделать защитные копии. Поддерживаемый набор валют надо проверять отдельно.\n\n## Вопросы на собеседовании\n\n1. Что станет с currency при исключении?\n2. Можно ли присвоить this.cents в compact constructor?\n3. Где копировать List?\n\nПри исключении создание не завершится. Явная запись в поля компонентов в compact constructor запрещена. Копируйте через присваивание параметру до автоматической инициализации полей.\n\n[Java 21 · Language Changes](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)",
+    "exercise": {
+      "code": "record Batch(List<String> ids) {}",
+      "prompt": "Добавьте compact constructor, чтобы список нельзя было изменить через исходную ссылку.",
+      "solution": "В компактном конструкторе напишите ids = List.copyOf(ids). Отдельно проверьте неизменяемость самих элементов."
+    },
+    "interview": {
+      "question": "How does a compact constructor validate a record?",
+      "answer": "A compact record constructor validates or normalizes the canonical constructor arguments before implicit field assignment. I use it to enforce invariants and defensively copy mutable inputs. Generating accessors and equality does not by itself enforce business constraints."
+    },
+    "num": 184,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "sealed-hierarchy",
+    "title": "Sealed classes: какие исходы оплаты возможны?",
+    "summary": "Обработчик поддерживает принятый и отклонённый платёж. Нужно, чтобы расширение набора исходов было контролируемым.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n  sealed interface Payment permits Paid, Declined {}\n\n  record Paid(long id) implements Payment {}\n\n  record Declined(String reason) implements Payment {}\n\n  static String describe(Payment p) {\n    return switch (p) {\n      case Paid paid -> \"paid\";\n      case Declined declined -> declined.reason();\n    };\n  }\n\n  public static void main(String[] args) throws Exception {\n    System.out.println(describe(new Declined(\"insufficient funds\")));\n  }\n}\n```\n\nДля опубликованных типов компилятор проверяет прямых наследников. Каждый разрешённый класс должен закрыть или явно открыть дальнейшее наследование через final, sealed или non-sealed; records уже final. Exhaustive switch выражает, какие ветви обработаны.\n\n## Вопросы на собеседовании\n\n1. Что изменится при добавлении Pending?\n2. Где должны находиться прямые наследники?\n3. Когда нужен non-sealed?\n\nПри перекомпиляции исчерпывающего switch без default потребуется новая ветвь. В именованном модуле наследники находятся в нём же, в безымянном — в одном пакете. Non-sealed открывает соответствующую ветку для дальнейших расширений.\n\n[Java 21 · Language Changes](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)",
+    "exercise": {
+      "code": "final class Pending implements Payment {}",
+      "prompt": "Что придётся изменить в permits и в switch при добавлении исхода Pending?",
+      "solution": "Добавьте Pending в разрешённых наследников и обработайте Pending в switch. Иначе при перекомпиляции он перестанет быть исчерпывающим."
+    },
+    "interview": {
+      "question": "How does a sealed hierarchy constrain its subtypes?",
+      "answer": "A sealed hierarchy limits direct subtypes and helps model a closed domain. I can then use exhaustive pattern switches so recompilation exposes missing cases. A permitted non-sealed subtype deliberately reopens one branch, so I choose that extension point explicitly."
+    },
+    "num": 185,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "instanceof-pattern",
+    "title": "Pattern matching for instanceof: где видна переменная?",
+    "summary": "Парсер принимает Object. Продолжать обработку можно только для непустой строки. Старый код дважды повторяет проверку и приведение типа.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    Object input = \" invoice \";\n    if (input instanceof String text && !text.isBlank()) {\n      System.out.println(text.strip());\n    }\n  }\n}\n```\n\ninvoice. Проверка типа и связывание переменной образуют одну операцию. text доступна справа от && и в ветке true, где компилятор знает об успехе проверки. Null не соответствует этому шаблону.\n\n## Вопросы на собеседовании\n\n1. Почему нельзя аналогично обратиться к text справа от ||?\n2. Можно ли использовать guard clause?\n3. Что даст null?\n\nПравая часть || выполняется при ложной левой части. После if (!(x instanceof String s)) return; переменная доступна на оставшемся пути. Для null условие ложно.\n\n[Java 21 · Language Changes](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)",
+    "exercise": {
+      "code": "if (x instanceof String s ",
+      "prompt": "| s.isEmpty()) use(s);|Почему s может быть недоступной? Запишите условие для непустой строки.",
+      "solution": "Используйте x instanceof String s && !s.isEmpty(). Справа от && успешная проверка уже установлена."
+    },
+    "interview": {
+      "question": "Where is an instanceof pattern variable in scope?",
+      "answer": "An instanceof pattern checks the runtime type and introduces a variable only on paths where the match is known to succeed. This removes the repeated cast and works naturally with guard clauses. Null does not match a type pattern."
+    },
+    "num": 186,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "switch-pattern",
+    "title": "Pattern matching for switch в Java 21",
+    "summary": "Валидатор различает пустую строку, заполненную строку, число и отсутствие значения. Как не потерять отдельный случай?",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    Object input = \"  \";\n    String result =\n        switch (input) {\n          case null -> \"missing\";\n          case String s when s.isBlank() -> \"blank\";\n          case String s -> s;\n          case Integer n -> n.toString();\n          default -> \"unsupported\";\n        };\n    System.out.println(result);\n  }\n}\n```\n\nblank. Guard when уточняет совпавший тип. Общая ветка String должна следовать за более узкой, иначе она доминирует над следующей. Для открытого Object нужна исчерпывающая обработка. В Java 21 pattern switch — окончательная возможность языка.\n\n## Вопросы на собеседовании\n\n1. Что меняет case null?\n2. Всегда ли требуется default?\n3. Чем плох default при закрытой sealed-иерархии?\n\nNull обрабатывается отдельно. Для полного набора разрешённых типов можно обойтись без default и получить сигнал компилятора при расширении модели.\n\n[Java 21 · Language Changes](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)",
+    "exercise": {
+      "code": "case String s -> s; case String s when s.isBlank() -> \"blank\";",
+      "prompt": "Почему ветвь blank недостижима? Исправьте порядок.",
+      "solution": "Расположите case String s when s.isBlank() перед общей ветвью case String s."
+    },
+    "interview": {
+      "question": "How do you make a pattern switch exhaustive?",
+      "answer": "Pattern switch selects by runtime shape and optional guards. Case ordering matters when one pattern dominates another. I make null handling explicit and prefer an exhaustive switch without a catch-all when the domain is deliberately closed."
+    },
+    "num": 187,
+    "group": "Java Core",
+    "checks": []
+  },
+  {
+    "slug": "text-blocks",
+    "title": "Text blocks: почему в строке появился последний перевод строки?",
+    "summary": "JSON-шаблон должен совпасть с ожидаемым текстом побайтно. Визуально он выглядит одинаково, но тест длины падает.",
+    "body": "## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    String json =\n        \"\"\"\n        {\"id\": 7}\n        \"\"\";\n    System.out.println(json.endsWith(\"\\n\"));\n    System.out.println(json.stripTrailing());\n  }\n}\n```\n\ntrue и строка JSON. Компилятор нормализует окончания строк и убирает несущественный отступ. Положение закрывающего разделителя определяет в том числе финальный перенос. Text block по-прежнему String; подстановку и экранирование пользовательских значений он не выполняет.\n\n## Вопросы на собеседовании\n\n1. Как сохранить значимый пробел?\n2. Как избежать последнего перевода?\n3. Подходит ли конкатенация text block для SQL-параметров?\n\nИспользуйте escape для значимого пробела или разместите закрывающий разделитель сразу после содержимого. Для параметров SQL нужен PreparedStatement.\n\n[Java 21 · Language Changes](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)",
+    "exercise": {
+      "code": "String query = \"SELECT * FROM t WHERE id=\" + userText;",
+      "prompt": "Устранит ли переход на text block риск некорректных SQL-параметров? Как правильно передать id?",
+      "solution": "Используйте PreparedStatement с параметром. Многострочный литерал меняет форму записи строки, не правила передачи данных в SQL."
+    },
+    "interview": {
+      "question": "How do text blocks handle indentation and the final newline?",
+      "answer": "Text blocks improve readability of multiline literals but still have precise whitespace and escape rules. I test the actual characters when generating a protocol payload. A text block is not a templating or escaping mechanism."
+    },
+    "num": 188,
+    "group": "Java Core",
+    "checks": []
+  }
+]

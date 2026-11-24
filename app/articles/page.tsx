@@ -19,6 +19,7 @@ export default function Collection() {
         <Link className="btn primary" href={"/articles/" + first.slug + "/"}>
           Начать с темы «{first.title}»
         </Link>
+        <p><Link href="/java-core/">Java Core · карта тем и первые 12 статей</Link></p>
       </header>
       <Catalog chapters={chapters.filter(chapter => chapter.id !== "interview")} />
     </main>

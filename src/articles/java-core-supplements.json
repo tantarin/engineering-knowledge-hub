@@ -1,0 +1,197 @@
+[
+  {
+    "slug": "hashmap-equals-hashcode",
+    "title": "Контракт equals и hashCode",
+    "summary": "Клиент повторно передал номер заказа. Проверим, сколько ключей останется при обновлении статуса.",
+    "body": "Клиент повторно передал номер заказа. Проверим, сколько ключей останется при обновлении статуса.\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    record Key(long id) {}\n    var m = new HashMap<Key, String>();\n    m.put(new Key(7), \"NEW\");\n    m.put(new Key(7), \"PAID\");\n    System.out.println(m.size() + \" \" + m.get(new Key(7)));\n  }\n}\n```\n\n1 PAID. Записи представляют один доменный ключ. Равенство симметрично и транзитивно; равные объекты обязаны давать один hashCode.\n\n## Вопросы на собеседовании\n\n1. Что будет с обычным классом без equals?\n2. Допустима ли коллизия?\n3. Какой компонент опасно включать в ключ?\n\nОбычный Object использует идентичность. Коллизии разрешены. Изменение участвующего в равенстве статуса нарушит стабильность ключа.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "public int hashCode() { return System.identityHashCode(this); }",
+      "prompt": "equals сравнивает номера заказа. Найдите нарушение и сформулируйте тест на двух разных объектах с одним id.",
+      "solution": "Верните Long.hashCode(id). Положите созданный Key(7) в карту и найдите его через другой Key(7)."
+    },
+    "interview": {
+      "question": "Why must equal keys have the same hash code?",
+      "answer": "A map needs a stable definition of the logical key. Equal keys must hash equally, while collisions between unequal keys are expected. For an order lookup I use an immutable identifier and test insertion and retrieval using two independently constructed keys."
+    }
+  },
+  {
+    "slug": "immutable-shared-state",
+    "title": "Неизменяемый объект и защитные копии",
+    "summary": "Загрузчик меняет исходный список уже после создания снимка маршрутов.",
+    "body": "Загрузчик меняет исходный список уже после создания снимка маршрутов.\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    record Routes(List<String> hosts) {\n      Routes {\n        hosts = List.copyOf(hosts);\n      }\n    }\n    var input = new ArrayList<>(List.of(\"a\"));\n    var routes = new Routes(input);\n    input.clear();\n    System.out.println(routes.hosts());\n  }\n}\n```\n\n[a]. Конструктор отделил состав списка от изменяемого источника. Неизменяемые строки безопасно разделять.\n\n## Вопросы на собеседовании\n\n1. Почему final недостаточно?\n2. Что если вместо String положить StringBuilder?\n3. Кто отвечает за публикацию?\n\nfinal запрещает переприсваивание поля. Вложенный StringBuilder останется общим, поэтому копируйте содержимое. Замену общей ссылки между потоками согласуйте отдельно.\n\n[Java Language Specification 21](https://docs.oracle.com/javase/specs/jls/se21/html/index.html)",
+    "exercise": {
+      "code": "record Routes(List<String> hosts) {}",
+      "prompt": "Загрузчик очистил список после создания Routes. Добавьте защиту и проверьте независимость снимка.",
+      "solution": "В конструкторе переопределите значение параметра: hosts = List.copyOf(hosts). После input.clear() снимок должен содержать прежний адрес."
+    },
+    "interview": {
+      "question": "How would you publish an immutable configuration snapshot?",
+      "answer": "I define immutability over the entire observable state. A final reference can still point to a mutable collection. I copy inputs and avoid exposing mutable children. Publishing a replacement snapshot to concurrent readers is a separate visibility concern."
+    }
+  },
+  {
+    "slug": "race-conditions",
+    "title": "ConcurrentHashMap и атомарная операция карты",
+    "summary": "Для одного ключа нужно суммировать события. Последовательность get, прибавить, put оставляет окно для второго обновления.",
+    "body": "Для одного ключа нужно суммировать события. Последовательность get, прибавить, put оставляет окно для второго обновления.\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var counts = new ConcurrentHashMap<String, Integer>();\n    try (var pool = Executors.newFixedThreadPool(2)) {\n      for (int i = 0; i < 100; i++) pool.submit(() -> counts.merge(\"A\", 1, Integer::sum));\n    }\n    System.out.println(counts.get(\"A\"));\n  }\n}\n```\n\n100. merge объединяет обновление одного ключа внутри операции ConcurrentHashMap. Обычный HashMap не обеспечивает безопасных конкурентных записей. Внешние вызовы и инварианты между ключами требуют другого механизма.\n\n## Вопросы на собеседовании\n\n1. Почему не хватает двух безопасных вызовов?\n2. Что при двух ключах?\n3. Стоит ли делать медленный HTTP внутри compute?\n\nОпределите границу атомарности. Для двух ключей требуется координация выше карты; долгие операции в функции обновления задерживают конкурирующие обращения.\n\n[Collections и Generics · Dev.java](https://dev.java/learn/)",
+    "exercise": {
+      "code": "counts.put(\"A\", counts.getOrDefault(\"A\", 0) + 1);",
+      "prompt": "Какие два чтения позволят потерять событие? Исправьте одним вызовом карты.",
+      "solution": "Два потока могут оба получить 0 и записать 1. Используйте counts.merge(\"A\", 1, Integer::sum)."
+    },
+    "interview": {
+      "question": "Which map operations can you compose safely across threads?",
+      "answer": "A concurrent map offers atomic operations such as merge for an individual key. A sequence of separate calls still has interleaving points. I keep remapping functions short and avoid treating a map update as a transaction with an external service."
+    }
+  },
+  {
+    "slug": "import-thread-interrupt",
+    "title": "InterruptedException: что делать с сигналом отмены?",
+    "summary": "Работник хочет прекратить ожидание. Проверим флаг сразу после исключения и после его восстановления.",
+    "body": "Работник хочет прекратить ожидание. Проверим флаг сразу после исключения и после его восстановления.\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    Thread.currentThread().interrupt();\n    try {\n      Thread.sleep(1000);\n    } catch (InterruptedException e) {\n      System.out.println(Thread.currentThread().isInterrupted());\n      Thread.currentThread().interrupt();\n    }\n    System.out.println(Thread.interrupted());\n  }\n}\n```\n\nfalse, затем true. Sleep реагирует на уже установленный флаг исключением и очищает его. Обработчик восстанавливает флаг, когда не передаёт исключение выше; последний вызов Thread.interrupted читает и очищает его.\n\n## Вопросы на собеседовании\n\n1. Чей флаг восстанавливается?\n2. Когда лучше объявить throws?\n3. Гарантирует ли interrupt отмену транзакции?\n\nВосстанавливается статус текущего потока. Если вызывающий код управляет отменой, можно передать InterruptedException. За судьбу транзакции отвечает её собственный протокол.\n\n[JLS 21 · Exceptions](https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html)",
+    "exercise": {
+      "code": "catch (InterruptedException ignored) { continue; }",
+      "prompt": "Что станет с остановкой работника? Предложите вариант для метода, который может объявить throws.",
+      "solution": "Пусть метод пробросит InterruptedException, а владелец задачи решит, как закончить. Continue может скрыть сигнал."
+    },
+    "interview": {
+      "question": "How should a worker respond to InterruptedException?",
+      "answer": "Interruption is cooperative. When an interruptible wait throws, I either propagate InterruptedException or restore the current thread's interrupt status if I translate the failure. I do not silently continue a loop or assume committed side effects can be undone."
+    }
+  },
+  {
+    "slug": "java-parallel-stream",
+    "title": "Когда parallel stream замедляет запрос?",
+    "summary": "Сервис суммирует короткий список чисел. Правильно ли ожидать ускорения просто после вызова parallel?",
+    "body": "Сервис суммирует короткий список чисел. Правильно ли ожидать ускорения просто после вызова parallel?\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.stream.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    int total = IntStream.rangeClosed(1, 100).parallel().sum();\n    System.out.println(total);\n  }\n}\n```\n\n5050. Суммирование допускает разбиение и объединение частичных результатов. Планирование и объединение тоже стоят времени. Общий ForkJoinPool может конкурировать с другими задачами процесса; блокирующие вызовы требуют отдельной оценки.\n\n## Вопросы на собеседовании\n\n1. Почему нельзя складывать в общий int[]?\n2. Как сравнить задержки?\n3. Что меняет маленький размер данных?\n\nИспользуйте reduction с корректной ассоциативной операцией. Сравнивайте после прогрева и под сопоставимой нагрузкой; малый объём редко покрывает накладные расходы.\n\n[Java 21 · Streams](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)",
+    "exercise": {
+      "code": "items.parallelStream().forEach(x -> result.add(x));",
+      "prompt": "result — общий ArrayList. Сформируйте список без конкурентной мутации этого объекта.",
+      "solution": "Используйте items.parallelStream().map(...).toList() либо collect с корректным коллектором."
+    },
+    "interview": {
+      "question": "When can parallelizing a stream hurt performance?",
+      "answer": "Parallel streams split a source and combine partial results. They work best for sufficiently large, splittable CPU work with associative reductions. Shared mutable state and blocking I/O can erase the benefit or break correctness, so I measure under realistic contention."
+    }
+  },
+  {
+    "slug": "gc-algorithms",
+    "title": "Как GC определяет, какие объекты можно освободить?",
+    "summary": "После завершения HTTP-запроса большой ответ остался в статическом кэше. Станет ли он мусором, если обнулить локальную ссылку?",
+    "body": "После завершения HTTP-запроса большой ответ остался в статическом кэше. Станет ли он мусором, если обнулить локальную ссылку?\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var cache = new HashMap<Integer, byte[]>();\n    byte[] reply = new byte[1024];\n    cache.put(1, reply);\n    reply = null;\n    System.out.println(cache.containsKey(1));\n  }\n}\n```\n\ntrue. Пока кэш достижим от корней, его ссылка удерживает ответ. Корнями служат, например, живые ссылки кадров активных потоков. Недостижимый цикл объектов тоже может быть собран. Точное время освобождения не входит в контракт.\n\n## Вопросы на собеседовании\n\n1. Что изменит cache.clear()?\n2. Гарантирует ли System.gc сборку сейчас?\n3. Почему GC не закрывает соединение вовремя?\n\nОчистка убирает один путь достижимости. Для внешнего ресурса используйте явное закрытие. System.gc — запрос, а не гарантия срока.\n\n[HotSpot 21 · GC Tuning Guide](https://docs.oracle.com/en/java/javase/21/gctuning/)",
+    "exercise": {
+      "code": "cache.put(id, reply); reply = null;",
+      "prompt": "Какой путь к данным остался? Когда этот объект станет кандидатом на сборку?",
+      "solution": "Ссылка остаётся в cache. Когда исчезнут все сильные пути от корней, объект сможет быть собран."
+    },
+    "interview": {
+      "question": "How does a garbage collector decide what it can reclaim?",
+      "answer": "Tracing collectors reason about reachability from roots. Clearing a local variable has no effect if a cache still retains the object. Unreachable cycles can be reclaimed, but time of collection is not a resource-management contract."
+    }
+  },
+  {
+    "slug": "java21-gc-choice",
+    "title": "G1 или ZGC: что ограничивает задержку?",
+    "summary": "Два одинаковых сервиса имеют разные требования к p99 и запасу CPU. Сначала выясните, какой сборщик реально выбран в процессе.",
+    "body": "Два одинаковых сервиса имеют разные требования к p99 и запасу CPU. Сначала выясните, какой сборщик реально выбран в процессе.\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.lang.management.ManagementFactory;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    ManagementFactory.getGarbageCollectorMXBeans().forEach(gc -> System.out.println(gc.getName()));\n  }\n}\n```\n\nИмена зависят от настроек JVM. В HotSpot 21 G1 управляет регионами и эвакуирует объекты в паузах, выбирая набор регионов под целевую длительность. ZGC переносит больше работы в конкурентные фазы. Сокращение пауз оплачивается ресурсами и не гарантирует лучшую пропускную способность.\n\n## Вопросы на собеседовании\n\n1. Какие метрики сравнить?\n2. Почему важна одинаковая нагрузка?\n3. Гарантирует ли MaxGCPauseMillis предел?\n\nСравните p99, распределение пауз, allocation rate, долю CPU и запас памяти при одинаковом live set. Цель паузы у G1 не является жёстким дедлайном.\n\n[HotSpot 21 · GC Tuning Guide](https://docs.oracle.com/en/java/javase/21/gctuning/)",
+    "exercise": {
+      "code": "-XX:MaxGCPauseMillis=50",
+      "prompt": "Доказывает ли настройка, что каждый HTTP-запрос завершится за 50 мс?",
+      "solution": "Нет. Это цель для пауз сборщика; запрос также ждёт сеть, очередь, блокировки и свои вычисления."
+    },
+    "interview": {
+      "question": "How would you compare G1 and ZGC for a latency-sensitive service?",
+      "answer": "I choose a collector against a workload and a latency budget. G1 and ZGC move different amounts of work between pauses and concurrent phases. I compare tail latency, CPU, throughput and headroom under the same load rather than assuming a universally faster collector."
+    }
+  },
+  {
+    "slug": "thread-pools",
+    "title": "ExecutorService и ThreadPoolExecutor: куда попадает задача?",
+    "summary": "Пул имеет одного основного и двух максимальных работников. Что будет со второй задачей, когда первая блокирована, а очередь свободна?",
+    "body": "Пул имеет одного основного и двух максимальных работников. Что будет со второй задачей, когда первая блокирована, а очередь свободна?\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var gate = new CountDownLatch(1);\n    try (var pool =\n        new ThreadPoolExecutor(1, 2, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1))) {\n      pool.submit(\n          () -> {\n            gate.await();\n            return 1;\n          });\n      try {\n        pool.submit(() -> 2);\n        System.out.println(pool.getQueue().size());\n      } finally {\n        gate.countDown();\n      }\n    }\n  }\n}\n```\n\n1. Сначала создаётся core-работник, затем исполнитель предпочитает поставить задачу в очередь. До maximumPoolSize он растёт, когда очередь не принимает задачу. ExecutorService задаёт API исполнения и жизненного цикла, а ThreadPoolExecutor определяет конкретную политику.\n\n## Вопросы на собеседовании\n\n1. Почему max не помог при длинной очереди?\n2. Как отделить очереди разных зависимостей?\n3. Какие метрики нужны?\n\nЗадайте явные лимиты и посмотрите queue time, глубину очереди, активные потоки и отказы. Раздельные исполнители полезны для изоляции ресурсов.\n\n[Java 21 · ThreadPoolExecutor](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html)",
+    "exercise": {
+      "code": "new ThreadPoolExecutor(2, 32, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());",
+      "prompt": "Почему под нагрузкой пул может оставаться на двух работниках?",
+      "solution": "Свободное место логически неограниченной очереди позволяет принимать задачи без роста до max. Измерьте задержку очереди."
+    },
+    "interview": {
+      "question": "How does an executor decide whether to queue a task or start a worker?",
+      "answer": "ExecutorService is a lifecycle and submission API. ThreadPoolExecutor combines core workers, a work queue, a maximum size and a rejection handler. I size these together because a large queue can hide saturation and keep the pool from growing beyond its core."
+    }
+  },
+  {
+    "slug": "atomic-operations",
+    "title": "AtomicInteger и CAS: один оставшийся билет",
+    "summary": "Осталось одно место. Прочитать положительный остаток и позже уменьшить его — два отдельных действия. Как связать условие с обновлением?",
+    "body": "Осталось одно место. Прочитать положительный остаток и позже уменьшить его — два отдельных действия. Как связать условие с обновлением?\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.atomic.AtomicInteger;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var stock = new AtomicInteger(1);\n    int expected = stock.get();\n    System.out.println(stock.compareAndSet(expected, 0));\n    System.out.println(stock.compareAndSet(expected, 0));\n  }\n}\n```\n\ntrue и false. CAS записывает новое значение, только если наблюдаемое равно ожидаемому. После конфликта надо заново прочесть остаток и проверить бизнес-условие. Для положительного n переход n→n−1 допустим, для нуля — отказ.\n\n## Вопросы на собеседовании\n\n1. Почему get плюс decrementAndGet недостаточно?\n2. Что если эффект отправки письма внутри функции повтора?\n3. Что с инвариантом двух счетов?\n\nДва атомарных вызова оставляют окно. Функция обновления может выполняться повторно. Для составного состояния используйте единый атомарный снимок или подходящую блокировку.\n\n[Java 21 · java.util.concurrent](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html)",
+    "exercise": {
+      "code": "if (stock.get() > 0) stock.decrementAndGet();",
+      "prompt": "Два покупателя увидели последнюю единицу. Запишите условный переход через CAS.",
+      "solution": "Прочитайте n; если n <= 0, откажите. При неудаче compareAndSet(n, n - 1) начните заново с чтения."
+    },
+    "interview": {
+      "question": "How does compare-and-set coordinate competing updates?",
+      "answer": "Compare-and-set ties a conditional check to one atomic update. A retry must re-read the value and re-evaluate business constraints. I keep side effects outside the retry function and avoid assuming a single atomic variable protects unrelated state."
+    }
+  },
+  {
+    "slug": "read-write-locks",
+    "title": "ReentrantReadWriteLock и StampedLock: как проверить снимок?",
+    "summary": "Цена и валюта меняются под общей блокировкой. Читателю нужны согласованные поля. Можно ли пропустить обычный read lock?",
+    "body": "Цена и валюта меняются под общей блокировкой. Читателю нужны согласованные поля. Можно ли пропустить обычный read lock?\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.locks.StampedLock;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    class Quote {\n      final StampedLock lock = new StampedLock();\n      int amount = 100;\n\n      int read() {\n        long stamp = lock.tryOptimisticRead();\n        int copy = amount;\n        if (!lock.validate(stamp)) {\n          stamp = lock.readLock();\n          try {\n            copy = amount;\n          } finally {\n            lock.unlockRead(stamp);\n          }\n        }\n        return copy;\n      }\n    }\n    System.out.println(new Quote().read());\n  }\n}\n```\n\nОптимистическое чтение выполняет копирование до validate. При вмешательстве писателя нужно перечитать данные под readLock. Нельзя делать необратимые действия по ещё не проверенному результату. ReentrantReadWriteLock поддерживает повторный вход; StampedLock оперирует stamp и не реентерабелен.\n\n## Вопросы на собеседовании\n\n1. Когда обычный read lock проще?\n2. Как защищаются писатели?\n3. Можно ли обходить изменяемую структуру без проверки безопасности промежуточных чтений?\n\nВсе писатели соблюдают один протокол. Оптимистический путь подходит для короткого чтения полей, где допустимы промежуточные значения до валидации. Если промежуточное состояние опасно, возьмите read lock.\n\n[Java 21 · java.util.concurrent](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html)",
+    "exercise": {
+      "code": "if (lock.validate(stamp)) return state.amount;",
+      "prompt": "Чтение сделано после проверки. Переставьте копирование и validate.",
+      "solution": "Сначала скопируйте нужные поля, затем проверьте stamp; при неуспехе возьмите read lock и перечитайте."
+    },
+    "interview": {
+      "question": "When is an optimistic read safe to use?",
+      "answer": "An ordinary read-write lock is straightforward when readers need a coherent region. StampedLock can validate an optimistic snapshot after copying fields, with a fallback to a read lock. It is not reentrant, and validation cannot undo an unsafe side effect."
+    }
+  },
+  {
+    "slug": "producer-consumer",
+    "title": "BlockingQueue: граница между приёмом и обработкой",
+    "summary": "Почтовый сервис принимает письма быстрее, чем отправляет. Как ограничить число заданий в ожидании?",
+    "body": "Почтовый сервис принимает письма быстрее, чем отправляет. Как ограничить число заданий в ожидании?\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    var queue = new ArrayBlockingQueue<String>(1);\n    System.out.println(queue.offer(\"mail-1\"));\n    System.out.println(queue.offer(\"mail-2\"));\n    System.out.println(queue.take());\n  }\n}\n```\n\ntrue, false, mail-1. Ёмкость в одно место делает перегрузку видимой. put блокирует производителя, offer без тайм-аута сообщает об отказе сразу. take ждёт элемент. Протокол завершения работников надо задать отдельно.\n\n## Вопросы на собеседовании\n\n1. Что если consumer упал?\n2. Гарантирует ли take доставку письма?\n3. Как завершить несколько работников?\n\nОграничьте ожидание и мониторьте работников. После take сообщение удалено из очереди процесса. Нужны явная остановка, прерывание или согласованное число маркеров; долговечность требует другой системы.\n\n[Java 21 · java.util.concurrent](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html)",
+    "exercise": {
+      "code": "queue.offer(mail); return \"accepted\";",
+      "prompt": "Когда этот ответ неправдив? Свяжите результат offer с политикой перегрузки.",
+      "solution": "При false очередь не приняла сообщение. Сообщите об отказе, повторите по контракту или используйте ограниченное ожидание."
+    },
+    "interview": {
+      "question": "How does a bounded queue apply backpressure?",
+      "answer": "A bounded blocking queue separates production and consumption and exposes overload. I choose between waiting, rejecting and timed admission. Removing an item from an in-memory queue does not mean the business operation was completed or persisted."
+    }
+  },
+  {
+    "slug": "classify-concurrency-failures",
+    "title": "Deadlock, livelock и starvation: какой прогресс пропал?",
+    "summary": "Два обработчика постоянно уступают друг другу ресурс. В логах много повторов, а счётчик завершённых операций не растёт.",
+    "body": "Два обработчика постоянно уступают друг другу ресурс. В логах много повторов, а счётчик завершённых операций не растёт.\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    int commits = 0;\n    for (int round = 1; round <= 3; round++) System.out.println(\"both retry: \" + round);\n    System.out.println(\"commits=\" + commits);\n  }\n}\n```\n\nЭто ограниченная модель наблюдения: идут попытки без завершений. Для livelock участники действуют, но мешают прогрессу. При deadlock ждут ресурсы в цикле. При starvation другие завершают работу, а конкретный участник систематически не получает ресурс.\n\n## Вопросы на собеседовании\n\n1. Что покажет счётчик попыток?\n2. Почему полезно измерять по участникам?\n3. Какое исправление подходит для цикла блокировок?\n\nСопоставьте retries, завершения, владельцев и интервалы ожидания. Для deadlock применяйте единый порядок захвата; для конфликтующих повторов — разрешение конфликта и ограниченный backoff.\n\n[Java 21 · java.util.concurrent](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html)",
+    "exercise": {
+      "code": "while (!tryReserve()) retryImmediately();",
+      "prompt": "Два клиента делают попытки, успехов нет. Какие наблюдения отличат livelock от ожидания блокировки?",
+      "solution": "Сравните рост attempts и завершений, состояния потоков, стеки и владельцев мониторов. Высокое число повторов указывает на активность."
+    },
+    "interview": {
+      "question": "How would you distinguish deadlock, livelock and starvation?",
+      "answer": "I distinguish failures by progress: deadlocked participants wait in a cycle, livelocked participants keep acting without completing, and starvation affects one participant while others progress. The right fix depends on which progress guarantee is missing."
+    }
+  },
+  {
+    "slug": "java21-virtual-threads",
+    "title": "Виртуальный поток на запрос в Java 21",
+    "summary": "Сервис тратит большую часть времени на сетевое ожидание. Нужен простой блокирующий код без выделения отдельного дорогого OS thread на каждый запрос.",
+    "body": "Сервис тратит большую часть времени на сетевое ожидание. Нужен простой блокирующий код без выделения отдельного дорогого OS thread на каждый запрос.\n\n## Проверьте на Java 21\n\nСохраните пример в Demo.java и выполните `java Demo.java`.\n\n```java\nimport java.util.concurrent.*;\n\nclass Demo {\n\n  public static void main(String[] args) throws Exception {\n    try (var p = Executors.newVirtualThreadPerTaskExecutor()) {\n      var response =\n          p.submit(\n              () -> {\n                Thread.sleep(10);\n                return Thread.currentThread().isVirtual();\n              });\n      System.out.println(response.get());\n    }\n  }\n}\n```\n\ntrue. В Java 21 исполнитель создаёт виртуальный поток на задачу. При поддерживаемом ожидании JVM снимает его с носителя. Партнёр не становится быстрее, а CPU-bound работа по-прежнему ограничена процессорами. Ограничения соединений и запросов к партнёру сохраняются.\n\n## Вопросы на собеседовании\n\n1. Почему не стоит пулить виртуальные потоки?\n2. Чем ограничить внешний API?\n3. Что такое pinning в JDK 21?\n\nОграничивайте использование дефицитного ресурса, например семафором. В JDK 21 блокирование при удержании synchronized может удерживать carrier; проверяйте реальные события JFR.\n\n[OpenJDK · JEP 444](https://openjdk.org/jeps/444)",
+    "exercise": {
+      "code": "var pool = Executors.newVirtualThreadPerTaskExecutor();",
+      "prompt": "Как сохранить максимум 20 одновременных запросов к партнёру при 5000 виртуальных задачах?",
+      "solution": "Возьмите разрешение общего Semaphore(20) перед обращением; освободите в finally только после успешного acquire."
+    },
+    "interview": {
+      "question": "When do virtual threads improve the throughput of a Java service?",
+      "answer": "Virtual threads make thread-per-request practical for many blocking I/O workloads. They improve the cost of waiting, not CPU parallelism or downstream capacity. I still bound scarce resources and inspect pinning when running on JDK 21."
+    }
+  }
+]

@@ -89,6 +89,13 @@ export default async function ReadArticle({ params }: Props) {
           {a.quiz && <section><h2>Проверь понимание</h2>
             {a.quiz.map(item => <Question key={item.prompt} item={item} />)}
           </section>}
+          {a.exercise && <section>
+            <h2>Найдите ошибку</h2>
+            <pre><code>{a.exercise.code}</code></pre>
+            <p>{a.exercise.prompt}</p>
+            <details><summary>Сверить решение</summary><p>{a.exercise.solution}</p></details>
+            <p><Link href="/java-core/">Вернуться к карте Java Core</Link></p>
+          </section>}
           {a.interview && <InterviewAnswer {...a.interview} />}
         </div>
         {a.ticket && (
