@@ -86,6 +86,9 @@ export default async function ReadArticle({ params }: Props) {
               reason: "Число RUNNABLE не указывает причину задержки. Стеки, прирост CPU time и метрики за один интервал помогут отличить вычисления от ожидания."
             }} />
           </section>}
+          {a.quiz && <section><h2>Проверь понимание</h2>
+            {a.quiz.map(item => <Question key={item.prompt} item={item} />)}
+          </section>}
           {a.interview && <InterviewAnswer {...a.interview} />}
         </div>
         {a.ticket && (

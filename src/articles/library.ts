@@ -8,6 +8,7 @@ export interface PublicArticle {
   summary: string;
   body: string;
   ticket?: string;
+  quiz?: { prompt: string; options: string[]; correct: number; reason: string }[];
   sqlExercise?: { hint: string; solution: string; explanation: string };
   interview?: { question: string; answer: string };
 }

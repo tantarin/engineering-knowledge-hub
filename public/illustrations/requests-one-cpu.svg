@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 210" role="img" aria-labelledby="title"><title id="title">Один CPU · запрос A ждёт, пока B считает</title><rect width="680" height="210" rx="14" fill="#f5f7fb"/><g font-family="system-ui,sans-serif" fill="#192943"><text x="16" y="32" font-size="21" font-weight="650">Один CPU · запрос A ждёт, пока B считает</text>
+<path d="M132 52v105" stroke="#c2cbd9"/><text x="132" y="178" text-anchor="middle" font-size="15">0</text>
+<path d="M202 52v105" stroke="#c2cbd9"/><text x="202" y="178" text-anchor="middle" font-size="15">1</text>
+<path d="M272 52v105" stroke="#c2cbd9"/><text x="272" y="178" text-anchor="middle" font-size="15">2</text>
+<path d="M342 52v105" stroke="#c2cbd9"/><text x="342" y="178" text-anchor="middle" font-size="15">3</text>
+<path d="M412 52v105" stroke="#c2cbd9"/><text x="412" y="178" text-anchor="middle" font-size="15">4</text>
+<path d="M482 52v105" stroke="#c2cbd9"/><text x="482" y="178" text-anchor="middle" font-size="15">5</text>
+<path d="M552 52v105" stroke="#c2cbd9"/><text x="552" y="178" text-anchor="middle" font-size="15">6</text>
+<path d="M622 52v105" stroke="#c2cbd9"/><text x="622" y="178" text-anchor="middle" font-size="15">7</text>
+<text x="644" y="178" font-size="16">мс</text>
+<text x="15" y="81" font-size="17">CPU сервиса</text>
+<rect x="132" y="58" width="70" height="34" rx="5" fill="#225799"/><text x="167.0" y="81" text-anchor="middle" font-size="17" fill="white">A</text>
+<rect x="202" y="58" width="280" height="34" rx="5" fill="#186653"/><text x="342.0" y="81" text-anchor="middle" font-size="17" fill="white">B рассчитывает стоимость</text>
+<text x="15" y="133" font-size="17">Ожидание A</text>
+<rect x="202" y="110" width="420" height="34" rx="5" fill="#86531b"/><text x="412.0" y="133" text-anchor="middle" font-size="17" fill="white">A ждёт ответ PostgreSQL</text>
+</g></svg>
